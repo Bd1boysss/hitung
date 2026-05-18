@@ -18,10 +18,12 @@
     .header p { margin: 0; opacity: 0.95; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     .card { background: white; border-radius: 18px; padding: 22px; box-shadow: 0 8px 22px rgba(0,0,0,0.08); margin-bottom:20px; }
+    .expense-card { border: 2px dashed #ffd58a; }
     .card h2 { margin-top: 0; font-size: 20px; color: #d56b00; }
     label { display: block; margin-top: 14px; margin-bottom: 6px; font-weight: bold; font-size: 14px; }
-    input, select { width: 100%; padding: 13px; border: 1px solid #ddd; border-radius: 12px; font-size: 15px; outline: none; background:white; }
-    input:focus, select:focus { border-color: #ff9f1c; box-shadow: 0 0 0 3px rgba(255,159,28,0.18); }
+    input, select, textarea { width: 100%; padding: 13px; border: 1px solid #ddd; border-radius: 12px; font-size: 15px; outline: none; background:white; }
+    textarea { min-height: 90px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { border-color: #ff9f1c; box-shadow: 0 0 0 3px rgba(255,159,28,0.18); }
     .summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 20px; }
     .result-box { background: #fff3d6; border-radius: 16px; padding: 18px; border: 1px solid #ffd58a; }
     .result-box span { display: block; color: #666; font-size: 14px; margin-bottom: 6px; }
@@ -41,7 +43,7 @@
     .chart-wrap { width:100%; overflow-x:auto; }
     canvas { width:100%; min-height:320px; border:1px solid #f1d7a7; border-radius:16px; background:#fffdf8; }
     table { width:100%; border-collapse: collapse; margin-top:12px; font-size:14px; }
-    th, td { padding:12px; border-bottom:1px solid #eee; text-align:left; }
+    th, td { padding:12px; border-bottom:1px solid #eee; text-align:left; vertical-align: top; }
     th { background:#fff3d6; }
     .table-wrap { overflow-x:auto; }
     .filter-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:14px; }
@@ -79,7 +81,7 @@
 
       <div class="grid">
         <div class="card">
-          <h2>Input Data Harian</h2>
+          <h2>Input Data Penjualan</h2>
           <label>Tanggal transaksi</label>
           <input type="date" id="tanggal" onchange="hitung()" />
           <label>Jumlah paket terjual (1 paket = 10 butir)</label>
@@ -96,12 +98,31 @@
           <label>Pengeluaran lain-lain</label>
           <input type="number" id="lain" placeholder="Contoh: 20000" oninput="hitung()" />
           <div class="button-row">
-            <button class="btn-main" id="btnSimpan">Simpan Data</button>
+            <button class="btn-main" id="btnSimpan">Simpan Data Penjualan</button>
             <button class="btn-reset" onclick="resetForm()">Reset Form</button>
           </div>
           <div class="note" id="simpanStatus"></div>
         </div>
 
+        <div class="card expense-card">
+          <h2>Catat Pengeluaran Saja</h2>
+          <label>Tanggal pengeluaran</label>
+          <input type="date" id="tanggalPengeluaran" />
+          <label>Nama pengeluaran</label>
+          <input type="text" id="namaPengeluaran" placeholder="Contoh: Beli plastik packing" />
+          <label>Jumlah pengeluaran</label>
+          <input type="number" id="jumlahPengeluaran" placeholder="Contoh: 25000" />
+          <label>Penjelasan / buat apa</label>
+          <textarea id="catatanPengeluaran" placeholder="Contoh: Untuk beli plastik, kardus, bubble wrap, bensin antar paket, garam, iklan tambahan, dll."></textarea>
+          <div class="button-row">
+            <button class="btn-main" id="btnSimpanPengeluaran">Simpan Pengeluaran</button>
+          </div>
+          <div class="note" id="pengeluaranStatus"></div>
+          <div class="note">Fitur ini untuk mencatat pengeluaran tanpa harus mengisi jumlah paket telur terjual.</div>
+        </div>
+      </div>
+
+      <div class="grid">
         <div class="card">
           <h2>Hasil Otomatis</h2>
           <div class="summary">
@@ -117,6 +138,15 @@
             <button class="btn-delete" id="btnHapusSemua">Hapus Semua Data</button>
           </div>
           <div class="note">Contoh: 1 paket = 10 × Rp2.000 = modal Rp20.000. Harga jual Rp45.500, laba kotor per paket sebelum biaya lain sekitar Rp25.500.</div>
+        </div>
+
+        <div class="card">
+          <h2>Keterangan Hitungan</h2>
+          <div class="note">
+            <b>Data penjualan</b> dipakai saat ada paket telur asin yang terjual.<br><br>
+            <b>Pengeluaran saja</b> dipakai untuk mencatat biaya tambahan, misalnya plastik, kardus, garam, bensin, parkir, iklan, ongkir tambahan, atau kebutuhan produksi lain.<br><br>
+            Data pengeluaran saja akan masuk ke rekap biaya dan grafik sebagai pengeluaran, tetapi jumlah paket dan omzet tetap 0.
+          </div>
         </div>
       </div>
 
@@ -149,7 +179,7 @@
         <div class="note" id="hapusStatus"></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Tanggal</th><th>Paket</th><th>Penjualan</th><th>Pengeluaran</th><th>Laba</th><th>ROI</th><th>Aksi</th></tr></thead>
+            <thead><tr><th>Tanggal</th><th>Jenis</th><th>Keterangan</th><th>Paket</th><th>Penjualan</th><th>Pengeluaran</th><th>Laba</th><th>ROI</th><th>Aksi</th></tr></thead>
             <tbody id="tabelData"></tbody>
           </table>
         </div>
@@ -162,7 +192,6 @@
   import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
   import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-  // GANTI BAGIAN INI DENGAN CONFIG FIREBASE MILIK KAMU
   const firebaseConfig = {
     apiKey: "AIzaSyCA0-vpOKAPl220hE9ocTYHcml7wXIDI5A",
     authDomain: "telurasin-87082.firebaseapp.com",
@@ -188,6 +217,7 @@
   document.getElementById('adminPassword').addEventListener('keydown', e => { if(e.key === 'Enter') login(); });
   document.getElementById('btnLogout').addEventListener('click', logout);
   document.getElementById('btnSimpan').addEventListener('click', simpanData);
+  document.getElementById('btnSimpanPengeluaran').addEventListener('click', simpanPengeluaranSaja);
   document.getElementById('btnHapusSemua').addEventListener('click', hapusSemuaData);
   document.getElementById('tabelData').addEventListener('click', function(e){
     if(e.target.classList.contains('hapus-item')) hapusData(e.target.dataset.id);
@@ -237,6 +267,7 @@
   function initTanggal(){
     const today = new Date().toISOString().slice(0,10);
     document.getElementById('tanggal').value = document.getElementById('tanggal').value || today;
+    document.getElementById('tanggalPengeluaran').value = document.getElementById('tanggalPengeluaran').value || today;
     document.getElementById('filterMulai').value = document.getElementById('filterMulai').value || today.slice(0,8) + '01';
     document.getElementById('filterAkhir').value = document.getElementById('filterAkhir').value || today;
   }
@@ -286,6 +317,7 @@
 
     try{
       await addDoc(dataRef, {
+        tipe: 'penjualan',
         tanggal,
         jumlah: hasil.jumlahTerjual,
         hargaJual: hasil.hargaJual,
@@ -300,12 +332,58 @@
         createdAt: serverTimestamp(),
         createdBy: auth.currentUser ? auth.currentUser.email : ''
       });
-      status.innerHTML = '<span class="status-ok">Data berhasil disimpan realtime.</span>';
+      status.innerHTML = '<span class="status-ok">Data penjualan berhasil disimpan realtime.</span>';
       resetForm();
     } catch(error){
       status.innerHTML = '<span class="status-error">Gagal menyimpan. Cek Firebase Rules.</span>';
     } finally {
       document.getElementById('btnSimpan').disabled = false;
+      setTimeout(() => status.innerHTML = '', 2500);
+    }
+  }
+
+  async function simpanPengeluaranSaja(){
+    const tanggal = document.getElementById('tanggalPengeluaran').value;
+    const nama = document.getElementById('namaPengeluaran').value.trim();
+    const jumlahPengeluaran = Number(document.getElementById('jumlahPengeluaran').value) || 0;
+    const catatan = document.getElementById('catatanPengeluaran').value.trim();
+    const status = document.getElementById('pengeluaranStatus');
+
+    if(!tanggal){ alert('Tanggal pengeluaran harus diisi.'); return; }
+    if(!nama){ alert('Nama pengeluaran harus diisi.'); return; }
+    if(jumlahPengeluaran <= 0){ alert('Jumlah pengeluaran harus lebih dari 0.'); return; }
+
+    document.getElementById('btnSimpanPengeluaran').disabled = true;
+    status.innerHTML = 'Menyimpan pengeluaran...';
+
+    try{
+      await addDoc(dataRef, {
+        tipe: 'pengeluaran',
+        tanggal,
+        namaPengeluaran: nama,
+        catatanPengeluaran: catatan,
+        jumlah: 0,
+        hargaJual: 0,
+        modalTelur: 0,
+        kemasan: 0,
+        iklan: 0,
+        lain: jumlahPengeluaran,
+        penjualan: 0,
+        pengeluaran: jumlahPengeluaran,
+        laba: -jumlahPengeluaran,
+        roi: 0,
+        createdAt: serverTimestamp(),
+        createdBy: auth.currentUser ? auth.currentUser.email : ''
+      });
+
+      document.getElementById('namaPengeluaran').value = '';
+      document.getElementById('jumlahPengeluaran').value = '';
+      document.getElementById('catatanPengeluaran').value = '';
+      status.innerHTML = '<span class="status-ok">Pengeluaran berhasil disimpan realtime.</span>';
+    } catch(error){
+      status.innerHTML = '<span class="status-error">Gagal menyimpan pengeluaran. Cek Firebase Rules.</span>';
+    } finally {
+      document.getElementById('btnSimpanPengeluaran').disabled = false;
       setTimeout(() => status.innerHTML = '', 2500);
     }
   }
@@ -382,23 +460,42 @@
     document.getElementById('rekapBoxLaba').className = laba < 0 ? 'result-box loss' : 'result-box profit';
   }
 
+  function escapeHTML(text){
+    return String(text || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   function renderTabel(data){
     const tbody = document.getElementById('tabelData');
     if(data.length === 0){
-      tbody.innerHTML = '<tr><td colspan="7">Belum ada data pada tanggal ini.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9">Belum ada data pada tanggal ini.</td></tr>';
       return;
     }
-    tbody.innerHTML = data.map(d => `
-      <tr>
-        <td>${d.tanggal || '-'}</td>
-        <td>${d.jumlah || 0}</td>
-        <td>${formatRupiah(Number(d.penjualan)||0)}</td>
-        <td>${formatRupiah(Number(d.pengeluaran)||0)}</td>
-        <td>${formatRupiah(Number(d.laba)||0)}</td>
-        <td>${Number(d.roi || 0).toFixed(2)}%</td>
-        <td><button type="button" class="btn-delete hapus-item" data-id="${d.id}">Hapus</button></td>
-      </tr>
-    `).join('');
+
+    tbody.innerHTML = data.map(d => {
+      const jenis = d.tipe === 'pengeluaran' ? 'Pengeluaran' : 'Penjualan';
+      const keterangan = d.tipe === 'pengeluaran'
+        ? escapeHTML(d.namaPengeluaran || '-') + '<br><span class="small">' + escapeHTML(d.catatanPengeluaran || '') + '</span>'
+        : 'Penjualan telur asin';
+
+      return `
+        <tr>
+          <td>${escapeHTML(d.tanggal || '-')}</td>
+          <td>${jenis}</td>
+          <td>${keterangan}</td>
+          <td>${Number(d.jumlah) || 0}</td>
+          <td>${formatRupiah(Number(d.penjualan)||0)}</td>
+          <td>${formatRupiah(Number(d.pengeluaran)||0)}</td>
+          <td>${formatRupiah(Number(d.laba)||0)}</td>
+          <td>${Number(d.roi || 0).toFixed(2)}%</td>
+          <td><button type="button" class="btn-delete hapus-item" data-id="${escapeHTML(d.id)}">Hapus</button></td>
+        </tr>
+      `;
+    }).join('');
   }
 
   function gambarGrafik(data){
