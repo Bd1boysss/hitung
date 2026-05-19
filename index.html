@@ -190,7 +190,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-  import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCA0-vpOKAPl220hE9ocTYHcml7wXIDI5A",
@@ -255,12 +255,16 @@
 
   function mulaiRealtime(){
     if(unsubscribeData) unsubscribeData();
-    const q = query(dataRef, orderBy('tanggal', 'asc'));
-    unsubscribeData = onSnapshot(q, snapshot => {
-      semuaDataRealtime = snapshot.docs.map(item => ({ id: item.id, ...item.data() }));
+
+    unsubscribeData = onSnapshot(dataRef, snapshot => {
+      semuaDataRealtime = snapshot.docs
+        .map(item => ({ id: item.id, ...item.data() }))
+        .sort((a,b) => String(a.tanggal || '').localeCompare(String(b.tanggal || '')));
+
       renderSemua();
     }, error => {
-      document.getElementById('hapusStatus').innerHTML = '<span class="status-error">Gagal mengambil data. Cek Firestore Rules dan koneksi internet.</span>';
+      console.error('Realtime Firestore error:', error);
+      document.getElementById('hapusStatus').innerHTML = '<span class="status-error">Data gagal dimuat realtime. Cek Firestore Rules atau koneksi.</span>';
     });
   }
 
@@ -316,7 +320,7 @@
     status.innerHTML = 'Menyimpan data...';
 
     try{
-      await addDoc(dataRef, {
+      const docBaru = {
         tipe: 'penjualan',
         tanggal,
         jumlah: hasil.jumlahTerjual,
@@ -331,7 +335,12 @@
         roi: hasil.roi,
         createdAt: serverTimestamp(),
         createdBy: auth.currentUser ? auth.currentUser.email : ''
-      });
+      };
+
+      const hasilSimpan = await addDoc(dataRef, docBaru);
+      semuaDataRealtime.push({ id: hasilSimpan.id, ...docBaru });
+      renderSemua();
+
       status.innerHTML = '<span class="status-ok">Data penjualan berhasil disimpan realtime.</span>';
       resetForm();
     } catch(error){
@@ -357,7 +366,7 @@
     status.innerHTML = 'Menyimpan pengeluaran...';
 
     try{
-      await addDoc(dataRef, {
+      const docBaru = {
         tipe: 'pengeluaran',
         tanggal,
         namaPengeluaran: nama,
@@ -374,7 +383,11 @@
         roi: 0,
         createdAt: serverTimestamp(),
         createdBy: auth.currentUser ? auth.currentUser.email : ''
-      });
+      };
+
+      const hasilSimpan = await addDoc(dataRef, docBaru);
+      semuaDataRealtime.push({ id: hasilSimpan.id, ...docBaru });
+      renderSemua();
 
       document.getElementById('namaPengeluaran').value = '';
       document.getElementById('jumlahPengeluaran').value = '';
