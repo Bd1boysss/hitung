@@ -6,6 +6,7 @@
   <title>Kas Telur Asin Bu Sri</title>
   <style>
     * { box-sizing: border-box; font-family: Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+    html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
     body { margin: 0; background: #fff7e6; color: #2b2b2b; }
     .login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 18px; background: linear-gradient(135deg, #f6b73c, #ff8c42); }
     .login-box { width: 100%; max-width: 420px; background: white; border-radius: 22px; padding: 26px; box-shadow: 0 12px 30px rgba(0,0,0,.18); }
@@ -17,7 +18,7 @@
     .header h1 { margin: 0 0 6px; font-size: 24px; }
     .header p { margin: 0; opacity: 0.95; font-size: 13px; }
     .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-    .card { background: white; border-radius: 18px; padding: 18px; box-shadow: 0 8px 22px rgba(0,0,0,0.08); margin-bottom:14px; }
+    .card { background: white; border-radius: 18px; padding: 18px; box-shadow: 0 8px 22px rgba(0,0,0,0.08); margin-bottom:14px; max-width:100%; overflow:hidden; }
     .card h2 { margin: 0 0 14px; font-size: 20px; color: #d56b00; }
     label { display: block; margin-top: 12px; margin-bottom: 6px; font-weight: bold; font-size: 14px; }
     input, select, textarea { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 14px; font-size: 16px; outline: none; background:white; }
@@ -48,12 +49,12 @@
     .chart-wrap { width:100%; overflow-x:auto; }
     canvas { width:100%; min-height:300px; border:1px solid #f1d7a7; border-radius:16px; background:#fffdf8; }
     .history-filter { display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; margin: 10px 0 14px; }
-    .history-filter-btn { border:1px solid #ffd58a; background:#fff; color:#333; padding:11px 8px; border-radius:14px; font-weight:bold; box-shadow:0 3px 10px rgba(0,0,0,0.06); }
+    .history-filter-btn { border:1px solid #ffd58a; background:#fff; color:#333; padding:11px 8px; border-radius:14px; font-weight:bold; box-shadow:0 3px 10px rgba(0,0,0,0.06); min-width:0; white-space:normal; }
     .history-filter-btn.active { background:#ff8c00; color:white; border-color:#ff8c00; }
     .history-summary { display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin: 12px 0 14px; }
-    .history-summary-card { border-radius:16px; padding:14px; border:1px solid #ddd; background:#fff; }
+    .history-summary-card { border-radius:16px; padding:14px; border:1px solid #ddd; background:#fff; min-width:0; overflow:hidden; }
     .history-summary-card span { display:block; font-size:13px; color:#666; margin-bottom:6px; }
-    .history-summary-card strong { font-size:20px; }
+    .history-summary-card strong { font-size:20px; word-break:break-word; overflow-wrap:anywhere; }
     .history-summary-card.in { background:#e9ffe8; border-color:#9ce39a; }
     .history-summary-card.out { background:#ffecec; border-color:#ff9b9b; }
     .history-summary-card.egg { background:#fff3d6; border-color:#ffd58a; }
@@ -71,16 +72,41 @@
     .filter-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; }
     .total-preview { background:#fff3d6; border:1px solid #ffd58a; border-radius:14px; padding:14px; margin-top:12px; font-weight:bold; }
     @media (max-width: 768px) {
-      .container { padding: 10px; padding-bottom: 90px; }
-      .grid, .summary, .filter-grid { grid-template-columns: 1fr; }
-      .summary { grid-template-columns: repeat(2, 1fr); }
-      .tabs { grid-template-columns: repeat(4, 1fr); gap:6px; overflow-x:auto; }
-      .tab-btn { font-size: 12px; padding: 11px 5px; white-space: nowrap; }
-      .history-filter { grid-template-columns: 1fr; }
+      .container { width:100%; max-width:100%; padding: 10px; padding-bottom: 90px; overflow-x:hidden; }
+      .grid, .filter-grid { grid-template-columns: 1fr; }
+      .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); gap:6px; overflow:visible; }
+      .tab-btn { font-size: 12px; padding: 11px 5px; white-space: nowrap; min-width:0; }
+      .history-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); gap:8px; }
+      .history-summary-card { padding:12px; }
+      .history-summary-card span { font-size:12px; }
+      .history-summary-card strong { font-size:16px; line-height:1.25; }
+      .history-filter { grid-template-columns: repeat(2, minmax(0, 1fr)); gap:8px; }
+      .history-filter-btn { font-size:13px; padding:10px 6px; }
+      .history-top { gap:8px; }
+      .amount { font-size:16px; text-align:right; }
       .header h1 { font-size: 20px; }
-      .card { padding: 16px; }
+      .card { padding: 16px; width:100%; max-width:100%; }
       .login-box h1 { font-size: 30px; }
       .result-box strong { font-size: 16px; }
+    }
+    @media (max-width: 380px) {
+      .history-summary { grid-template-columns: 1fr; }
+      .history-filter { grid-template-columns: 1fr; }
+      .summary { grid-template-columns: 1fr; }
+    }
+
+    /* MOBILE RIWAYAT FIX V2 - paksa tidak melebar di HP */
+    .history-summary, .history-filter, .history-list { width: 100%; max-width: 100%; }
+    @media (max-width: 900px) {
+      body, .container, .card, .section { overflow-x: hidden !important; }
+      .history-summary { display: grid !important; grid-template-columns: 1fr !important; gap: 10px !important; }
+      .history-summary-card { width: 100% !important; max-width: 100% !important; min-width: 0 !important; display: block !important; }
+      .history-summary-card strong { font-size: 18px !important; overflow-wrap: anywhere !important; word-break: break-word !important; }
+      .history-filter { display: grid !important; grid-template-columns: 1fr !important; gap: 8px !important; }
+      .history-filter-btn { width: 100% !important; white-space: normal !important; }
+      .history-top { display: grid !important; grid-template-columns: 1fr !important; }
+      .amount { text-align: left !important; }
     }
   </style>
 </head>
@@ -102,6 +128,7 @@
         <div>
           <h1>Kas Telur Asin Bu Sri</h1>
           <p>Catat pemasukan, pengeluaran, dan khusus pembelian telur.</p>
+          <p class="small">Versi mobile fix riwayat v2</p>
           <p class="small" id="userInfo"></p>
         </div>
         <button class="btn-dark" id="btnLogout">Logout</button>
