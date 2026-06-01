@@ -108,6 +108,17 @@
       .history-top { display: grid !important; grid-template-columns: 1fr !important; }
       .amount { text-align: left !important; }
     }
+
+    /* FIX MOBILE RIWAYAT V3 - paksa tidak melebar di HP */
+    html, body { max-width: 100%; overflow-x: hidden !important; }
+    .container, .card, .section, .history-list, .history-item { max-width: 100% !important; overflow-x: hidden !important; }
+    .history-summary { display: grid !important; grid-template-columns: 1fr !important; width: 100% !important; max-width: 100% !important; gap: 10px !important; }
+    .history-summary-card { width: 100% !important; max-width: 100% !important; min-width: 0 !important; display: block !important; }
+    .history-summary-card strong { font-size: 18px !important; line-height: 1.25 !important; overflow-wrap: anywhere !important; word-break: break-word !important; }
+    .history-filter { display: grid !important; grid-template-columns: 1fr !important; width: 100% !important; gap: 8px !important; }
+    .history-filter-btn { width: 100% !important; white-space: normal !important; }
+    .history-top { display: grid !important; grid-template-columns: 1fr !important; gap: 8px !important; }
+    .history-amount { text-align: left !important; font-size: 22px !important; }
   </style>
 </head>
 <body>
@@ -128,7 +139,7 @@
         <div>
           <h1>Kas Telur Asin Bu Sri</h1>
           <p>Catat pemasukan, pengeluaran, dan khusus pembelian telur.</p>
-          <p class="small">Versi mobile fix riwayat v2</p>
+          <p class="small">Versi mobile fix riwayat v3</p>
           <p class="small" id="userInfo"></p>
         </div>
         <button class="btn-dark" id="btnLogout">Logout</button>
