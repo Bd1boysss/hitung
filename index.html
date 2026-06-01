@@ -86,13 +86,12 @@
   <div class="login-page" id="loginPage">
     <div class="login-box">
       <h1>Login Admin</h1>
-      <p>Masuk pakai akun Firebase agar data kas sinkron di semua HP/laptop.</p>
-      <label for="adminEmail">Email Admin</label>
-      <input type="email" id="adminEmail" placeholder="Contoh: admin@email.com" autocomplete="email" />
+      <p>Masukkan password admin untuk membuka dashboard kas.</p>
       <label for="adminPassword">Password</label>
       <input type="password" id="adminPassword" placeholder="Masukkan password" autocomplete="current-password" />
       <button class="btn-main" style="width:100%;margin-top:18px" id="btnLogin">Masuk</button>
       <div class="note" id="loginError"></div>
+      <div class="note">Password: <b>tampan123</b></div>
     </div>
   </div>
 
@@ -210,7 +209,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+  import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
   import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -226,6 +225,7 @@
   const auth = getAuth(appFirebase);
   const db = getFirestore(appFirebase);
   const dataRef = collection(db, "penjualan_telur_asin");
+  const ADMIN_PASSWORD = "tampan123";
   let semuaDataRealtime = [];
   let unsubscribeData = null;
 
@@ -400,20 +400,34 @@
   }
 
   async function login() {
-    const email = el('adminEmail').value.trim();
     const pass = el('adminPassword').value.trim();
     setStatus('loginError', '');
-    if (!email || !pass) { setStatus('loginError', 'Email dan password harus diisi.', 'error'); return; }
-    try { await signInWithEmailAndPassword(auth, email, pass); }
-    catch (error) { setStatus('loginError', 'Login gagal. Cek email/password.', 'error'); }
+
+    if (!pass) {
+      setStatus('loginError', 'Password harus diisi.', 'error');
+      return;
+    }
+
+    if (pass !== ADMIN_PASSWORD) {
+      setStatus('loginError', 'Password salah.', 'error');
+      return;
+    }
+
+    try {
+      await signInAnonymously(auth);
+      sessionStorage.setItem('kasTelurAsinLogin', 'true');
+    } catch (error) {
+      console.error('Login anonymous gagal:', error);
+      setStatus('loginError', 'Login gagal. Aktifkan Anonymous di Firebase Authentication.', 'error');
+    }
   }
 
-  async function logout() { await signOut(auth); }
+  async function logout() { sessionStorage.removeItem('kasTelurAsinLogin'); await signOut(auth); }
 
   function bukaApp(user) {
     el('loginPage').style.display = 'none';
     el('app').style.display = 'block';
-    el('userInfo').innerText = 'Login sebagai: ' + user.email;
+    el('userInfo').innerText = 'Login admin aktif';
     initTanggal();
     hitungTotalTelur();
   }
@@ -440,7 +454,7 @@
     el('btnSimpanPemasukan').disabled = true;
     setStatus('statusPemasukan', 'Menyimpan pemasukan...');
     try {
-      await addDoc(dataRef, { tipe: 'pemasukan', kategori: 'umum', tanggal, nama, pemasukan: jumlah, pengeluaran: 0, catatan, createdAt: serverTimestamp(), createdBy: auth.currentUser ? auth.currentUser.email : '' });
+      await addDoc(dataRef, { tipe: 'pemasukan', kategori: 'umum', tanggal, nama, pemasukan: jumlah, pengeluaran: 0, catatan, createdAt: serverTimestamp(), createdBy: auth.currentUser ? auth.currentUser.uid : 'admin' });
       el('namaPemasukan').value = ''; el('jumlahPemasukan').value = ''; el('catatanPemasukan').value = '';
       setStatus('statusPemasukan', 'Pemasukan berhasil disimpan.');
     } catch (error) { setStatus('statusPemasukan', 'Gagal menyimpan pemasukan.', 'error'); }
@@ -458,7 +472,7 @@
     el('btnSimpanPengeluaran').disabled = true;
     setStatus('statusPengeluaran', 'Menyimpan pengeluaran...');
     try {
-      await addDoc(dataRef, { tipe: 'pengeluaran', kategori: 'umum', tanggal, nama, pemasukan: 0, pengeluaran: jumlah, catatan, createdAt: serverTimestamp(), createdBy: auth.currentUser ? auth.currentUser.email : '' });
+      await addDoc(dataRef, { tipe: 'pengeluaran', kategori: 'umum', tanggal, nama, pemasukan: 0, pengeluaran: jumlah, catatan, createdAt: serverTimestamp(), createdBy: auth.currentUser ? auth.currentUser.uid : 'admin' });
       el('namaPengeluaran').value = ''; el('jumlahPengeluaran').value = ''; el('catatanPengeluaran').value = '';
       setStatus('statusPengeluaran', 'Pengeluaran berhasil disimpan.');
     } catch (error) { setStatus('statusPengeluaran', 'Gagal menyimpan pengeluaran.', 'error'); }
@@ -476,7 +490,7 @@
     el('btnSimpanTelur').disabled = true;
     setStatus('statusTelur', 'Menyimpan pengeluaran telur...');
     try {
-      await addDoc(dataRef, { tipe: 'pengeluaran', kategori: 'telur', tanggal, nama: 'Beli telur', hargaTelur, jumlahTelur, pemasukan: 0, pengeluaran: total, catatan, createdAt: serverTimestamp(), createdBy: auth.currentUser ? auth.currentUser.email : '' });
+      await addDoc(dataRef, { tipe: 'pengeluaran', kategori: 'telur', tanggal, nama: 'Beli telur', hargaTelur, jumlahTelur, pemasukan: 0, pengeluaran: total, catatan, createdAt: serverTimestamp(), createdBy: auth.currentUser ? auth.currentUser.uid : 'admin' });
       el('jumlahTelur').value = ''; el('catatanTelur').value = ''; hitungTotalTelur();
       setStatus('statusTelur', 'Pengeluaran telur berhasil disimpan.');
     } catch (error) { setStatus('statusTelur', 'Gagal menyimpan pengeluaran telur.', 'error'); }
@@ -523,13 +537,23 @@
     });
   }
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) { bukaApp(user); mulaiRealtime(); }
-    else {
-      if (unsubscribeData) unsubscribeData();
-      el('app').style.display = 'none';
-      el('loginPage').style.display = 'flex';
+  onAuthStateChanged(auth, async (user) => {
+    const sudahLogin = sessionStorage.getItem('kasTelurAsinLogin') === 'true';
+
+    if (user && sudahLogin) {
+      bukaApp(user);
+      mulaiRealtime();
+      return;
     }
+
+    if (user && !sudahLogin) {
+      await signOut(auth);
+      return;
+    }
+
+    if (unsubscribeData) unsubscribeData();
+    el('app').style.display = 'none';
+    el('loginPage').style.display = 'flex';
   });
 
   pasangEvent();
