@@ -47,15 +47,16 @@
     .section.active { display:block; }
     .chart-wrap { width:100%; overflow-x:auto; }
     canvas { width:100%; min-height:300px; border:1px solid #f1d7a7; border-radius:16px; background:#fffdf8; }
-    .history-filter { display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin: 10px 0 14px; }
+    .history-filter { display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; margin: 10px 0 14px; }
     .history-filter-btn { border:1px solid #ffd58a; background:#fff; color:#333; padding:11px 8px; border-radius:14px; font-weight:bold; box-shadow:0 3px 10px rgba(0,0,0,0.06); }
     .history-filter-btn.active { background:#ff8c00; color:white; border-color:#ff8c00; }
-    .history-summary { display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; margin: 12px 0 14px; }
+    .history-summary { display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin: 12px 0 14px; }
     .history-summary-card { border-radius:16px; padding:14px; border:1px solid #ddd; background:#fff; }
     .history-summary-card span { display:block; font-size:13px; color:#666; margin-bottom:6px; }
     .history-summary-card strong { font-size:20px; }
     .history-summary-card.in { background:#e9ffe8; border-color:#9ce39a; }
     .history-summary-card.out { background:#ffecec; border-color:#ff9b9b; }
+    .history-summary-card.egg { background:#fff3d6; border-color:#ffd58a; }
     .history-list { display:grid; gap:10px; }
     .history-item { border:1px solid #eee; border-radius:16px; padding:14px; background:#fffdf8; }
     .history-top { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
@@ -199,27 +200,32 @@
         </div>
 
         <div class="card">
-          <h2>Grafik Otomatis</h2>
-          <div class="chart-wrap"><canvas id="grafik" width="1000" height="320"></canvas></div>
-        </div>
-
-        <div class="card">
           <h2>Riwayat Data</h2>
+          <div class="note">Pilih kategori riwayat di bawah, lalu klik download untuk menyimpan CSV.</div>
           <div class="history-summary">
             <div class="history-summary-card in"><span>Total Riwayat Pemasukan</span><strong id="riwayatTotalPemasukan">Rp0</strong></div>
             <div class="history-summary-card out"><span>Total Riwayat Pengeluaran</span><strong id="riwayatTotalPengeluaran">Rp0</strong></div>
+            <div class="history-summary-card egg"><span>Total Riwayat Telur</span><strong id="riwayatTotalTelur">Rp0</strong></div>
+            <div class="history-summary-card egg"><span>Jumlah Telur</span><strong id="riwayatJumlahTelur">0 butir</strong></div>
           </div>
           <div class="history-filter">
             <button type="button" class="history-filter-btn active" data-riwayat="semua">All</button>
             <button type="button" class="history-filter-btn" data-riwayat="pemasukan">Riwayat Pemasukan</button>
             <button type="button" class="history-filter-btn" data-riwayat="pengeluaran">Riwayat Pengeluaran</button>
+            <button type="button" class="history-filter-btn" data-riwayat="telur">Riwayat Telur</button>
           </div>
           <div class="button-row">
             <button type="button" class="btn-print" id="btnDownloadRiwayat">Download File Riwayat (.CSV)</button>
           </div>
-          <div class="note">Download mengikuti kategori yang dipilih: All, Riwayat Pemasukan, atau Riwayat Pengeluaran.</div>
+          <div class="note">Download mengikuti kategori yang dipilih: All, Riwayat Pemasukan, Riwayat Pengeluaran, atau Riwayat Telur.</div>
           <div class="history-list" id="riwayatData"></div>
         </div>
+
+        <div class="card">
+          <h2>Grafik Otomatis</h2>
+          <div class="chart-wrap"><canvas id="grafik" width="1000" height="320"></canvas></div>
+        </div>
+
       </section>
     </div>
   </div>
@@ -500,6 +506,33 @@
     setTimeout(() => el("hapusStatus").innerHTML = "", 2500);
   }
 
+
+  function isDataTelur(d) {
+    const teks = String((d.nama || '') + ' ' + (d.catatan || '') + ' ' + (d.namaPengeluaran || '') + ' ' + (d.catatanPengeluaran || '')).toLowerCase();
+
+    // Catatan penting:
+    // - Data dari form khusus telur tetap masuk kategori telur.
+    // - Data lama yang punya jumlahTelur/hargaTelur juga tetap masuk kategori telur.
+    // - Kata "tray telur" tidak otomatis masuk telur, karena itu biaya alat/kemasan dan harus masuk pengeluaran biasa.
+    if (teks.includes("tray")) return false;
+
+    return d.tipe === "telur" || d.kategori === "telur" || d.jenis === "telur" || Number(d.jumlahTelur || 0) > 0 || Number(d.hargaTelur || 0) > 0 || teks.includes("telur mentah") || teks.includes("telur bebek");
+  }
+
+  function tipeEfektif(d) {
+    if (d.tipe === "pemasukan") return "pemasukan";
+    if (isDataTelur(d)) return "telur";
+    return "pengeluaran";
+  }
+
+  function nominalKeluar(d) {
+    return Number(d.pengeluaran || d.nominal || 0) || 0;
+  }
+
+  function nominalMasuk(d) {
+    return Number(d.pemasukan || d.nominal || 0) || 0;
+  }
+
   function renderSemua() {
     const data = dataTerfilter();
     renderRekap(data);
@@ -508,10 +541,16 @@
   }
 
   function renderRekap(data) {
-    const pemasukan = data.reduce((sum, d) => sum + (Number(d.pemasukan) || 0), 0);
-    const pengeluaran = data.reduce((sum, d) => sum + (Number(d.pengeluaran) || 0), 0);
-    const telur = data.filter((d) => d.tipe === "telur").reduce((sum, d) => sum + (Number(d.pengeluaran) || 0), 0);
-    const saldo = pemasukan - pengeluaran;
+    const pemasukan = data
+      .filter((d) => tipeEfektif(d) === "pemasukan")
+      .reduce((sum, d) => sum + nominalMasuk(d), 0);
+    const pengeluaran = data
+      .filter((d) => tipeEfektif(d) === "pengeluaran")
+      .reduce((sum, d) => sum + nominalKeluar(d), 0);
+    const telur = data
+      .filter((d) => tipeEfektif(d) === "telur")
+      .reduce((sum, d) => sum + nominalKeluar(d), 0);
+    const saldo = pemasukan - pengeluaran - telur;
 
     el("rekapPemasukan").innerText = formatRupiah(pemasukan);
     el("rekapPengeluaran").innerText = formatRupiah(pengeluaran);
@@ -524,9 +563,11 @@
     let dataRiwayat = [...data];
 
     if (modeRiwayat === "pemasukan") {
-      dataRiwayat = dataRiwayat.filter((d) => d.tipe === "pemasukan");
+      dataRiwayat = dataRiwayat.filter((d) => tipeEfektif(d) === "pemasukan");
     } else if (modeRiwayat === "pengeluaran") {
-      dataRiwayat = dataRiwayat.filter((d) => d.tipe === "pengeluaran" || d.tipe === "telur");
+      dataRiwayat = dataRiwayat.filter((d) => tipeEfektif(d) === "pengeluaran");
+    } else if (modeRiwayat === "telur") {
+      dataRiwayat = dataRiwayat.filter((d) => tipeEfektif(d) === "telur");
     }
 
     return dataRiwayat.sort((a, b) => String(b.tanggal || "").localeCompare(String(a.tanggal || "")));
@@ -534,15 +575,25 @@
 
   function renderRiwayatSummary(data) {
     const totalPemasukan = data
-      .filter((d) => d.tipe === "pemasukan")
-      .reduce((sum, d) => sum + (Number(d.pemasukan || d.nominal) || 0), 0);
+      .filter((d) => tipeEfektif(d) === "pemasukan")
+      .reduce((sum, d) => sum + nominalMasuk(d), 0);
 
     const totalPengeluaran = data
-      .filter((d) => d.tipe === "pengeluaran" || d.tipe === "telur")
-      .reduce((sum, d) => sum + (Number(d.pengeluaran || d.nominal) || 0), 0);
+      .filter((d) => tipeEfektif(d) === "pengeluaran")
+      .reduce((sum, d) => sum + nominalKeluar(d), 0);
+
+    const totalTelur = data
+      .filter((d) => tipeEfektif(d) === "telur")
+      .reduce((sum, d) => sum + nominalKeluar(d), 0);
+
+    const jumlahTelur = data
+      .filter((d) => tipeEfektif(d) === "telur")
+      .reduce((sum, d) => sum + (Number(d.jumlahTelur) || 0), 0);
 
     el("riwayatTotalPemasukan").innerText = formatRupiah(totalPemasukan);
     el("riwayatTotalPengeluaran").innerText = formatRupiah(totalPengeluaran);
+    el("riwayatTotalTelur").innerText = formatRupiah(totalTelur);
+    el("riwayatJumlahTelur").innerText = jumlahTelur + " butir";
   }
 
   function renderRiwayat(data) {
@@ -557,14 +608,15 @@
     }
 
     list.innerHTML = dataRiwayat.map((d) => {
-      const isIn = d.tipe === "pemasukan";
-      const isEgg = d.tipe === "telur";
+      const tipe = tipeEfektif(d);
+      const isIn = tipe === "pemasukan";
+      const isEgg = tipe === "telur";
       const badgeClass = isIn ? "in" : (isEgg ? "egg" : "out");
       const label = isIn ? "Pemasukan" : (isEgg ? "Pengeluaran Telur" : "Pengeluaran");
       const amountClass = isIn ? "in" : "out";
-      const amount = isIn ? Number(d.pemasukan || d.nominal || 0) : Number(d.pengeluaran || d.nominal || 0);
+      const amount = isIn ? nominalMasuk(d) : nominalKeluar(d);
       const sign = isIn ? "+" : "-";
-      const detailTelur = isEgg ? "<br><span class='small'>Jumlah telur: " + escapeHTML(d.jumlahTelur || 0) + " butir, harga: " + formatRupiah(d.hargaTelur || 0) + "</span>" : "";
+      const detailTelur = isEgg ? "<br><span class='small'>Jumlah telur: " + escapeHTML(d.jumlahTelur || 0) + " butir · Harga: " + formatRupiah(d.hargaTelur || 0) + " / butir</span>" : "";
 
       return `
         <div class="history-item">
@@ -603,11 +655,12 @@
     ];
 
     data.forEach((d) => {
-      const isPemasukan = d.tipe === "pemasukan";
-      const isTelur = d.tipe === "telur";
+      const tipe = tipeEfektif(d);
+      const isPemasukan = tipe === "pemasukan";
+      const isTelur = tipe === "telur";
       const kategori = isPemasukan ? "Pemasukan" : (isTelur ? "Pengeluaran Telur" : "Pengeluaran");
-      const pemasukan = isPemasukan ? Number(d.pemasukan || d.nominal || 0) : 0;
-      const pengeluaran = isPemasukan ? 0 : Number(d.pengeluaran || d.nominal || 0);
+      const pemasukan = isPemasukan ? nominalMasuk(d) : 0;
+      const pengeluaran = isPemasukan ? 0 : nominalKeluar(d);
 
       rows.push([
         d.tanggal || "",
@@ -650,16 +703,18 @@
     const perTanggal = {};
     data.forEach((d) => {
       const key = d.tanggal || "-";
-      if (!perTanggal[key]) perTanggal[key] = { label: key, pemasukan: 0, pengeluaran: 0 };
-      perTanggal[key].pemasukan += Number(d.pemasukan) || 0;
-      perTanggal[key].pengeluaran += Number(d.pengeluaran) || 0;
+      if (!perTanggal[key]) perTanggal[key] = { label: key, pemasukan: 0, pengeluaran: 0, telur: 0 };
+      const tipe = tipeEfektif(d);
+      if (tipe === "pemasukan") perTanggal[key].pemasukan += nominalMasuk(d);
+      if (tipe === "pengeluaran") perTanggal[key].pengeluaran += nominalKeluar(d);
+      if (tipe === "telur") perTanggal[key].telur += nominalKeluar(d);
     });
 
     const rows = Object.values(perTanggal);
     const pad = 55;
     const w = canvas.width - pad * 2;
     const h = canvas.height - pad * 2;
-    const max = Math.max(...rows.flatMap((d) => [d.pemasukan, d.pengeluaran]), 1);
+    const max = Math.max(...rows.flatMap((d) => [d.pemasukan, d.pengeluaran, d.telur]), 1);
     const step = w / rows.length;
     const barW = Math.min(32, step / 4);
 
@@ -676,8 +731,9 @@
 
     rows.forEach((d, i) => {
       const x = pad + i * step + step / 2;
-      drawBar(ctx, x - barW, d.pemasukan, max, pad, h, barW, "#27ae60");
-      drawBar(ctx, x + 4, d.pengeluaran, max, pad, h, barW, "#ff5757");
+      drawBar(ctx, x - barW * 1.4, d.pemasukan, max, pad, h, barW, "#27ae60");
+      drawBar(ctx, x - barW * 0.2, d.pengeluaran, max, pad, h, barW, "#ff5757");
+      drawBar(ctx, x + barW, d.telur, max, pad, h, barW, "#ff9f1c");
       ctx.save();
       ctx.translate(x - 16, canvas.height - 16);
       ctx.rotate(-0.35);
@@ -694,6 +750,10 @@
     ctx.fillRect(pad + 130, 18, 12, 12);
     ctx.fillStyle = "#333";
     ctx.fillText("Pengeluaran", pad + 148, 29);
+    ctx.fillStyle = "#ff9f1c";
+    ctx.fillRect(pad + 285, 18, 12, 12);
+    ctx.fillStyle = "#333";
+    ctx.fillText("Khusus Telur", pad + 303, 29);
   }
 
   function drawBar(ctx, x, value, max, pad, h, barW, color) {
