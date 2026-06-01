@@ -47,6 +47,15 @@
     .section.active { display:block; }
     .chart-wrap { width:100%; overflow-x:auto; }
     canvas { width:100%; min-height:300px; border:1px solid #f1d7a7; border-radius:16px; background:#fffdf8; }
+    .history-filter { display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin: 10px 0 14px; }
+    .history-filter-btn { border:1px solid #ffd58a; background:#fff; color:#333; padding:11px 8px; border-radius:14px; font-weight:bold; box-shadow:0 3px 10px rgba(0,0,0,0.06); }
+    .history-filter-btn.active { background:#ff8c00; color:white; border-color:#ff8c00; }
+    .history-summary { display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; margin: 12px 0 14px; }
+    .history-summary-card { border-radius:16px; padding:14px; border:1px solid #ddd; background:#fff; }
+    .history-summary-card span { display:block; font-size:13px; color:#666; margin-bottom:6px; }
+    .history-summary-card strong { font-size:20px; }
+    .history-summary-card.in { background:#e9ffe8; border-color:#9ce39a; }
+    .history-summary-card.out { background:#ffecec; border-color:#ff9b9b; }
     .history-list { display:grid; gap:10px; }
     .history-item { border:1px solid #eee; border-radius:16px; padding:14px; background:#fffdf8; }
     .history-top { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
@@ -66,6 +75,7 @@
       .summary { grid-template-columns: repeat(2, 1fr); }
       .tabs { grid-template-columns: repeat(4, 1fr); gap:6px; overflow-x:auto; }
       .tab-btn { font-size: 12px; padding: 11px 5px; white-space: nowrap; }
+      .history-filter { grid-template-columns: 1fr; }
       .header h1 { font-size: 20px; }
       .card { padding: 16px; }
       .login-box h1 { font-size: 30px; }
@@ -195,6 +205,19 @@
 
         <div class="card">
           <h2>Riwayat Data</h2>
+          <div class="history-summary">
+            <div class="history-summary-card in"><span>Total Riwayat Pemasukan</span><strong id="riwayatTotalPemasukan">Rp0</strong></div>
+            <div class="history-summary-card out"><span>Total Riwayat Pengeluaran</span><strong id="riwayatTotalPengeluaran">Rp0</strong></div>
+          </div>
+          <div class="history-filter">
+            <button type="button" class="history-filter-btn active" data-riwayat="semua">All</button>
+            <button type="button" class="history-filter-btn" data-riwayat="pemasukan">Riwayat Pemasukan</button>
+            <button type="button" class="history-filter-btn" data-riwayat="pengeluaran">Riwayat Pengeluaran</button>
+          </div>
+          <div class="button-row">
+            <button type="button" class="btn-print" id="btnDownloadRiwayat">Download File Riwayat (.CSV)</button>
+          </div>
+          <div class="note">Download mengikuti kategori yang dipilih: All, Riwayat Pemasukan, atau Riwayat Pengeluaran.</div>
           <div class="history-list" id="riwayatData"></div>
         </div>
       </section>
@@ -225,6 +248,7 @@
 
   let semuaDataRealtime = [];
   let unsubscribeData = null;
+  let modeRiwayat = "semua";
 
   const el = (id) => document.getElementById(id);
 
@@ -496,19 +520,47 @@
     el("saldoBox").className = saldo < 0 ? "result-box loss" : "result-box profit";
   }
 
+  function getRiwayatByMode(data) {
+    let dataRiwayat = [...data];
+
+    if (modeRiwayat === "pemasukan") {
+      dataRiwayat = dataRiwayat.filter((d) => d.tipe === "pemasukan");
+    } else if (modeRiwayat === "pengeluaran") {
+      dataRiwayat = dataRiwayat.filter((d) => d.tipe === "pengeluaran" || d.tipe === "telur");
+    }
+
+    return dataRiwayat.sort((a, b) => String(b.tanggal || "").localeCompare(String(a.tanggal || "")));
+  }
+
+  function renderRiwayatSummary(data) {
+    const totalPemasukan = data
+      .filter((d) => d.tipe === "pemasukan")
+      .reduce((sum, d) => sum + (Number(d.pemasukan || d.nominal) || 0), 0);
+
+    const totalPengeluaran = data
+      .filter((d) => d.tipe === "pengeluaran" || d.tipe === "telur")
+      .reduce((sum, d) => sum + (Number(d.pengeluaran || d.nominal) || 0), 0);
+
+    el("riwayatTotalPemasukan").innerText = formatRupiah(totalPemasukan);
+    el("riwayatTotalPengeluaran").innerText = formatRupiah(totalPengeluaran);
+  }
+
   function renderRiwayat(data) {
+    renderRiwayatSummary(data);
     const list = el("riwayatData");
-    if (!data.length) {
-      list.innerHTML = '<div class="note">Belum ada data pada filter tanggal ini.</div>';
+    const dataRiwayat = getRiwayatByMode(data);
+
+    if (!dataRiwayat.length) {
+      const labelKosong = modeRiwayat === "semua" ? "data" : modeRiwayat;
+      list.innerHTML = '<div class="note">Belum ada riwayat ' + labelKosong + ' pada filter tanggal ini.</div>';
       return;
     }
 
-    const sorted = [...data].sort((a, b) => String(b.tanggal || "").localeCompare(String(a.tanggal || "")));
-    list.innerHTML = sorted.map((d) => {
+    list.innerHTML = dataRiwayat.map((d) => {
       const isIn = d.tipe === "pemasukan";
       const isEgg = d.tipe === "telur";
       const badgeClass = isIn ? "in" : (isEgg ? "egg" : "out");
-      const label = isIn ? "Pemasukan" : (isEgg ? "Telur" : "Pengeluaran");
+      const label = isIn ? "Pemasukan" : (isEgg ? "Pengeluaran Telur" : "Pengeluaran");
       const amountClass = isIn ? "in" : "out";
       const amount = isIn ? Number(d.pemasukan || d.nominal || 0) : Number(d.pengeluaran || d.nominal || 0);
       const sign = isIn ? "+" : "-";
@@ -531,6 +583,57 @@
         </div>
       `;
     }).join("");
+  }
+
+  function csvValue(value) {
+    const text = String(value ?? "");
+    return '"' + text.replace(/"/g, '""') + '"';
+  }
+
+  function downloadRiwayatCSV() {
+    const data = getRiwayatByMode(dataTerfilter());
+
+    if (!data.length) {
+      alert("Tidak ada data untuk didownload pada kategori/filter ini.");
+      return;
+    }
+
+    const rows = [
+      ["Tanggal", "Kategori", "Nama", "Catatan", "Jumlah Telur", "Harga Telur", "Pemasukan", "Pengeluaran", "Saldo Bersih"]
+    ];
+
+    data.forEach((d) => {
+      const isPemasukan = d.tipe === "pemasukan";
+      const isTelur = d.tipe === "telur";
+      const kategori = isPemasukan ? "Pemasukan" : (isTelur ? "Pengeluaran Telur" : "Pengeluaran");
+      const pemasukan = isPemasukan ? Number(d.pemasukan || d.nominal || 0) : 0;
+      const pengeluaran = isPemasukan ? 0 : Number(d.pengeluaran || d.nominal || 0);
+
+      rows.push([
+        d.tanggal || "",
+        kategori,
+        d.nama || "",
+        d.catatan || "",
+        isTelur ? (d.jumlahTelur || 0) : "",
+        isTelur ? (d.hargaTelur || 0) : "",
+        pemasukan,
+        pengeluaran,
+        pemasukan - pengeluaran
+      ]);
+    });
+
+    const csv = "\ufeff" + rows.map((row) => row.map(csvValue).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const mulai = el("filterMulai").value || "awal";
+    const akhir = el("filterAkhir").value || "akhir";
+    link.href = url;
+    link.download = "riwayat-" + modeRiwayat + "-" + mulai + "-sd-" + akhir + ".csv";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
   }
 
   function gambarGrafik(data) {
@@ -607,12 +710,22 @@
     el("btnSimpanPengeluaran").addEventListener("click", simpanPengeluaran);
     el("btnSimpanTelur").addEventListener("click", simpanTelur);
     el("btnHapusSemua").addEventListener("click", hapusSemuaData);
+    el("btnDownloadRiwayat").addEventListener("click", downloadRiwayatCSV);
     el("filterMulai").addEventListener("change", renderSemua);
     el("filterAkhir").addEventListener("change", renderSemua);
     el("hargaTelur").addEventListener("change", updateTotalTelur);
     el("jumlahTelur").addEventListener("input", updateTotalTelur);
     el("riwayatData").addEventListener("click", (e) => {
       if (e.target.classList.contains("hapus-item")) hapusData(e.target.dataset.id);
+    });
+
+    document.querySelectorAll(".history-filter-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".history-filter-btn").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        modeRiwayat = btn.dataset.riwayat || "semua";
+        renderSemua();
+      });
     });
 
     document.querySelectorAll(".tab-btn").forEach((btn) => {
