@@ -5,93 +5,83 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>Kas Telur Asin Bu Sri</title>
   <style>
-    * { box-sizing: border-box; font-family: Arial, sans-serif; }
-    html { scroll-behavior: smooth; }
-    body { margin: 0; background: #fff7e6; color: #252525; }
-    .login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: linear-gradient(135deg, #f6b73c, #ff8c42); }
-    .login-box { width: 100%; max-width: 420px; background: #fff; border-radius: 22px; padding: 26px; box-shadow: 0 14px 34px rgba(0,0,0,.18); }
-    .login-box h1 { margin: 0 0 8px; color: #d56b00; }
-    .login-box p { margin: 0 0 18px; color: #666; line-height: 1.5; }
+    * { box-sizing: border-box; font-family: Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; background: #fff7e6; color: #2b2b2b; }
+    .login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 18px; background: linear-gradient(135deg, #f6b73c, #ff8c42); }
+    .login-box { width: 100%; max-width: 420px; background: white; border-radius: 22px; padding: 26px; box-shadow: 0 12px 30px rgba(0,0,0,.18); }
+    .login-box h1 { margin: 0 0 8px; color: #d56b00; font-size: 34px; }
+    .login-box p { margin-top: 0; color: #666; line-height: 1.45; }
     .app { display: none; }
-    .container { max-width: 980px; margin: auto; padding: 16px; }
-    .header { background: linear-gradient(135deg, #f6b73c, #ff8c42); color: #fff; padding: 20px; border-radius: 22px; margin-bottom: 14px; box-shadow: 0 10px 25px rgba(0,0,0,.12); display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; }
-    .header h1 { margin: 0 0 6px; font-size: 26px; }
-    .header p { margin: 0; opacity: .95; line-height: 1.45; }
-    .top-dashboard { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 12px; }
-    .dash-card { border-radius: 18px; padding: 14px; background: #fff; box-shadow: 0 7px 18px rgba(0,0,0,.08); border: 1px solid #ffe0a8; }
-    .dash-card span { display: block; color: #666; font-size: 12px; margin-bottom: 7px; }
-    .dash-card strong { display: block; font-size: 19px; word-break: break-word; }
-    .dash-income { background: #e9ffe8; border-color: #9ce39a; }
-    .dash-expense { background: #ffecec; border-color: #ffb1b1; }
-    .dash-balance { background: #eef5ff; border-color: #a9c9ff; }
-    .dash-egg { background: #fff3d6; border-color: #ffd58a; }
-    .tabs { position: sticky; top: 0; z-index: 10; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; background: rgba(255,247,230,.96); padding: 10px 0; backdrop-filter: blur(8px); }
-    .tab-btn { background: #fff; color: #333; border: 1px solid #ffd58a; border-radius: 14px; padding: 12px 8px; font-weight: 800; box-shadow: 0 5px 14px rgba(0,0,0,.06); min-height: 46px; }
-    .tab-btn.active { background: #ff8c00; color: #fff; border-color: #ff8c00; }
-    .card { background: #fff; border-radius: 20px; padding: 20px; box-shadow: 0 8px 22px rgba(0,0,0,.08); margin: 14px 0; }
-    .card h2 { margin: 0 0 10px; font-size: 20px; color: #d56b00; }
-    .card-desc { color: #666; line-height: 1.5; margin: 0 0 14px; font-size: 14px; }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
-    label { display: block; margin-top: 13px; margin-bottom: 6px; font-weight: 700; font-size: 14px; }
-    input, select, textarea { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 14px; font-size: 16px; outline: none; background: #fff; }
-    textarea { min-height: 92px; resize: vertical; line-height: 1.45; }
-    input:focus, select:focus, textarea:focus { border-color: #ff9f1c; box-shadow: 0 0 0 3px rgba(255,159,28,.18); }
-    .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    .button-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
-    button { border: none; padding: 14px 16px; border-radius: 14px; cursor: pointer; font-weight: 700; font-size: 15px; min-height: 46px; }
+    .container { max-width: 1100px; margin: auto; padding: 14px; padding-bottom: 80px; }
+    .header { background: linear-gradient(135deg, #f6b73c, #ff8c42); color: white; padding: 18px; border-radius: 20px; margin-bottom: 14px; display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap; box-shadow: 0 8px 20px rgba(0,0,0,0.10); }
+    .header h1 { margin: 0 0 6px; font-size: 24px; }
+    .header p { margin: 0; opacity: 0.95; font-size: 13px; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .card { background: white; border-radius: 18px; padding: 18px; box-shadow: 0 8px 22px rgba(0,0,0,0.08); margin-bottom:14px; }
+    .card h2 { margin: 0 0 14px; font-size: 20px; color: #d56b00; }
+    label { display: block; margin-top: 12px; margin-bottom: 6px; font-weight: bold; font-size: 14px; }
+    input, select, textarea { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 14px; font-size: 16px; outline: none; background:white; }
+    textarea { min-height: 92px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { border-color: #ff9f1c; box-shadow: 0 0 0 3px rgba(255,159,28,0.18); }
+    .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+    .result-box { background: white; border-radius: 16px; padding: 14px; border: 1px solid #ffd58a; box-shadow: 0 6px 16px rgba(0,0,0,0.06); }
+    .result-box span { display: block; color: #666; font-size: 12px; margin-bottom: 6px; }
+    .result-box strong { font-size: 18px; color: #222; }
+    .profit { background: #e9ffe8; border-color: #9ce39a; }
+    .loss { background: #ffecec; border-color: #ff9b9b; }
+    .egg { background: #fff3d6; border-color: #ffd58a; }
+    .tabs { position: sticky; top: 0; z-index: 10; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; background:#fff7e6; padding: 8px 0 12px; }
+    .tab-btn { border: none; padding: 12px 8px; border-radius: 14px; background: #fff; color:#333; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .tab-btn.active { background: #ff8c00; color: white; }
+    button { border: none; padding: 14px 18px; border-radius: 14px; cursor: pointer; font-weight: bold; font-size: 15px; }
     button:disabled { opacity: .55; cursor: not-allowed; }
-    .btn-main { background: #ff8c00; color: #fff; }
-    .btn-income { background: #20a049; color: #fff; }
-    .btn-expense, .btn-delete { background: #ff5757; color: #fff; }
-    .btn-blue { background: #2f80ed; color: #fff; }
-    .btn-dark { background: #333; color: #fff; }
+    .btn-main { background: #ff8c00; color: white; }
+    .btn-reset, .btn-delete { background: #ff5757; color: white; }
+    .btn-dark { background:#333; color:white; }
+    .button-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; }
+    .button-row button { flex:1; min-width: 140px; }
     .note { margin-top: 12px; font-size: 14px; color: #666; line-height: 1.55; }
-    .status-ok { color: #168a2f; font-weight: 700; }
-    .status-error { color: #d60000; font-weight: 700; }
-    .chart-wrap { width: 100%; overflow-x: auto; }
-    canvas { width: 100%; min-height: 300px; border: 1px solid #f1d7a7; border-radius: 16px; background: #fffdf8; }
-    .history-list { display: grid; gap: 12px; }
-    .history-item { border: 1px solid #f0dfbf; border-radius: 16px; padding: 14px; background: #fffdf8; display: grid; gap: 8px; }
-    .history-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-    .badge { display: inline-block; padding: 5px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; margin-bottom: 5px; }
-    .badge-income { background: #dff9e6; color: #168a2f; }
-    .badge-expense { background: #ffe0e0; color: #c91818; }
-    .badge-egg { background: #fff0c8; color: #a65d00; }
-    .history-title { font-weight: 700; font-size: 15px; }
-    .history-meta { color: #666; font-size: 13px; line-height: 1.5; }
-    .history-value { font-size: 18px; font-weight: 800; white-space: nowrap; }
-    .small { font-size: 13px; color: #777; }
-    .final-box { margin-top: 12px; padding: 14px; border-radius: 16px; background: #fff3d6; border: 1px solid #ffd58a; }
-    .final-box span { color: #666; display: block; margin-bottom: 5px; font-size: 13px; }
-    .final-box strong { font-size: 22px; }
-    @media (max-width: 760px) {
-      .container { padding: 12px; }
-      .header { padding: 18px; border-radius: 18px; }
-      .header h1 { font-size: 22px; }
-      .top-dashboard { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .dash-card { padding: 13px; border-radius: 16px; }
-      .dash-card strong { font-size: 17px; }
-      .tabs { grid-template-columns: repeat(2, 1fr); }
-      .card { padding: 16px; border-radius: 18px; }
-      .form-grid { grid-template-columns: 1fr; }
-      .button-row { flex-direction: column; }
-      button { width: 100%; }
-      canvas { min-width: 720px; }
+    .status-ok { color:#168a2f; font-weight:bold; }
+    .status-error { color:#d60000; font-weight:bold; }
+    .section { display:none; }
+    .section.active { display:block; }
+    .chart-wrap { width:100%; overflow-x:auto; }
+    canvas { width:100%; min-height:300px; border:1px solid #f1d7a7; border-radius:16px; background:#fffdf8; }
+    .history-list { display:grid; gap:10px; }
+    .history-item { border:1px solid #eee; border-radius:16px; padding:14px; background:#fffdf8; }
+    .history-top { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+    .badge { display:inline-block; padding:5px 10px; border-radius:999px; font-size:12px; font-weight:bold; }
+    .badge.in { background:#e9ffe8; color:#167a29; }
+    .badge.out { background:#ffecec; color:#b90000; }
+    .badge.egg { background:#fff3d6; color:#b65e00; }
+    .amount { font-weight:bold; font-size:18px; }
+    .amount.in { color:#168a2f; }
+    .amount.out { color:#d60000; }
+    .small { font-size: 13px; color:#777; }
+    .filter-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; }
+    .total-preview { background:#fff3d6; border:1px solid #ffd58a; border-radius:14px; padding:14px; margin-top:12px; font-weight:bold; }
+    @media (max-width: 768px) {
+      .container { padding: 10px; padding-bottom: 90px; }
+      .grid, .summary, .filter-grid { grid-template-columns: 1fr; }
+      .summary { grid-template-columns: repeat(2, 1fr); }
+      .tabs { grid-template-columns: repeat(4, 1fr); gap:6px; overflow-x:auto; }
+      .tab-btn { font-size: 12px; padding: 11px 5px; white-space: nowrap; }
+      .header h1 { font-size: 20px; }
+      .card { padding: 16px; }
+      .login-box h1 { font-size: 30px; }
+      .result-box strong { font-size: 16px; }
     }
-    @media print { .login-page, .tabs, .button-row { display: none !important; } .app { display: block !important; } body { background: #fff; } .card, .header, .dash-card { box-shadow: none; } }
   </style>
 </head>
 <body>
   <div class="login-page" id="loginPage">
     <div class="login-box">
-      <h1>Login Admin</h1>
+      <h1>Login</h1>
       <p>Masukkan password admin untuk membuka dashboard kas.</p>
       <label for="adminPassword">Password</label>
       <input type="password" id="adminPassword" placeholder="Masukkan password" autocomplete="current-password" />
       <button class="btn-main" style="width:100%;margin-top:18px" id="btnLogin">Masuk</button>
       <div class="note" id="loginError"></div>
-      <div class="note">Password: <b>tampan123</b></div>
     </div>
   </div>
 
@@ -100,108 +90,112 @@
       <div class="header">
         <div>
           <h1>Kas Telur Asin Bu Sri</h1>
-          <p>Dashboard di atas, lalu pilih menu supaya form tidak campur saat scroll di HP.</p>
+          <p>Catat pemasukan, pengeluaran, dan khusus pembelian telur.</p>
           <p class="small" id="userInfo"></p>
         </div>
         <button class="btn-dark" id="btnLogout">Logout</button>
       </div>
 
-      <section class="top-dashboard" id="dashboard">
-        <div class="dash-card dash-income"><span>Total Pemasukan</span><strong id="dashPemasukan">Rp0</strong></div>
-        <div class="dash-card dash-expense"><span>Total Pengeluaran</span><strong id="dashPengeluaran">Rp0</strong></div>
-        <div class="dash-card dash-balance"><span>Saldo Bersih</span><strong id="dashSaldo">Rp0</strong></div>
-        <div class="dash-card dash-egg"><span>Khusus Telur</span><strong id="dashTelur">Rp0</strong></div>
-      </section>
+      <div class="summary">
+        <div class="result-box profit"><span>Total Pemasukan</span><strong id="rekapPemasukan">Rp0</strong></div>
+        <div class="result-box loss"><span>Total Pengeluaran</span><strong id="rekapPengeluaran">Rp0</strong></div>
+        <div class="result-box egg"><span>Khusus Telur</span><strong id="rekapTelur">Rp0</strong></div>
+        <div class="result-box" id="saldoBox"><span>Saldo Bersih</span><strong id="rekapSaldo">Rp0</strong></div>
+      </div>
 
-      <nav class="tabs" aria-label="Menu utama">
-        <button type="button" class="tab-btn active" data-tab="pemasukan">Pemasukan</button>
-        <button type="button" class="tab-btn" data-tab="pengeluaran">Pengeluaran</button>
-        <button type="button" class="tab-btn" data-tab="telur">Telur</button>
-        <button type="button" class="tab-btn" data-tab="riwayat">Riwayat</button>
-      </nav>
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="pemasukan">Pemasukan</button>
+        <button class="tab-btn" data-tab="pengeluaran">Pengeluaran</button>
+        <button class="tab-btn" data-tab="telur">Telur</button>
+        <button class="tab-btn" data-tab="riwayat">Riwayat</button>
+      </div>
 
-      <section class="tab-panel active" id="panel-pemasukan">
+      <section class="section active" id="section-pemasukan">
         <div class="card">
           <h2>Catat Pemasukan</h2>
-          <p class="card-desc">Untuk uang masuk, misalnya hasil jualan, transfer, atau pemasukan lain.</p>
-          <label for="tanggalPemasukan">Tanggal pemasukan</label>
+          <label for="tanggalPemasukan">Tanggal</label>
           <input type="date" id="tanggalPemasukan" />
           <label for="namaPemasukan">Nama pemasukan</label>
-          <input type="text" id="namaPemasukan" placeholder="Contoh: Penjualan TikTok hari ini" />
+          <input type="text" id="namaPemasukan" placeholder="Contoh: Penjualan TikTok / COD / transfer" />
           <label for="jumlahPemasukan">Jumlah pemasukan</label>
-          <input type="text" inputmode="numeric" id="jumlahPemasukan" placeholder="Contoh: 145000" />
+          <input type="text" inputmode="numeric" id="jumlahPemasukan" placeholder="Contoh: 45500" />
           <label for="catatanPemasukan">Catatan</label>
-          <textarea id="catatanPemasukan" placeholder="Contoh: Order dari TikTok / COD / transfer pelanggan"></textarea>
-          <button class="btn-income" id="btnSimpanPemasukan">Simpan Pemasukan</button>
-          <div class="note" id="statusPemasukan"></div>
+          <textarea id="catatanPemasukan" placeholder="Contoh: Pembayaran 1 pack telur asin dari TikTok"></textarea>
+          <div class="button-row">
+            <button class="btn-main" id="btnSimpanPemasukan">Simpan Pemasukan</button>
+          </div>
+          <div class="note" id="pemasukanStatus"></div>
         </div>
       </section>
 
-      <section class="tab-panel" id="panel-pengeluaran">
+      <section class="section" id="section-pengeluaran">
         <div class="card">
           <h2>Catat Pengeluaran</h2>
-          <p class="card-desc">Untuk biaya umum seperti plastik, bensin, iklan, kardus, garam, ongkir tambahan, dan lainnya.</p>
-          <label for="tanggalPengeluaran">Tanggal pengeluaran</label>
+          <label for="tanggalPengeluaran">Tanggal</label>
           <input type="date" id="tanggalPengeluaran" />
           <label for="namaPengeluaran">Nama pengeluaran</label>
-          <input type="text" id="namaPengeluaran" placeholder="Contoh: Iklan TikTok" />
+          <input type="text" id="namaPengeluaran" placeholder="Contoh: Plastik packing / garam / bensin" />
           <label for="jumlahPengeluaran">Jumlah pengeluaran</label>
-          <input type="text" inputmode="numeric" id="jumlahPengeluaran" placeholder="Contoh: 100000" />
-          <label for="catatanPengeluaran">Catatan / buat apa</label>
-          <textarea id="catatanPengeluaran" placeholder="Contoh: Biaya iklan untuk konten packing"></textarea>
-          <button class="btn-expense" id="btnSimpanPengeluaran">Simpan Pengeluaran</button>
-          <div class="note" id="statusPengeluaran"></div>
+          <input type="text" inputmode="numeric" id="jumlahPengeluaran" placeholder="Contoh: 25000" />
+          <label for="catatanPengeluaran">Catatan</label>
+          <textarea id="catatanPengeluaran" placeholder="Contoh: Untuk beli plastik, kardus, bubble wrap, bensin, dll."></textarea>
+          <div class="button-row">
+            <button class="btn-main" id="btnSimpanPengeluaran">Simpan Pengeluaran</button>
+          </div>
+          <div class="note" id="pengeluaranStatus"></div>
         </div>
       </section>
 
-      <section class="tab-panel" id="panel-telur">
+      <section class="section" id="section-telur">
         <div class="card">
           <h2>Pengeluaran Khusus Telur</h2>
-          <p class="card-desc">Pilih harga telur per butir, isi jumlah telur, lalu total otomatis muncul.</p>
-          <div class="form-grid">
-            <div>
-              <label for="tanggalTelur">Tanggal beli telur</label>
-              <input type="date" id="tanggalTelur" />
-            </div>
-            <div>
-              <label for="hargaTelur">Harga per butir</label>
-              <select id="hargaTelur">
-                <option value="2000">Rp2.000 / butir</option>
-                <option value="2250">Rp2.250 / butir</option>
-                <option value="2500">Rp2.500 / butir</option>
-              </select>
-            </div>
-            <div>
-              <label for="jumlahTelur">Jumlah telur</label>
-              <input type="text" inputmode="numeric" id="jumlahTelur" placeholder="Contoh: 35" />
-            </div>
-          </div>
-          <div class="final-box"><span>Total pengeluaran telur</span><strong id="totalTelurPreview">Rp0</strong></div>
+          <label for="tanggalTelur">Tanggal beli telur</label>
+          <input type="date" id="tanggalTelur" />
+          <label for="hargaTelur">Harga telur per butir</label>
+          <select id="hargaTelur">
+            <option value="2000">Rp2.000 / butir</option>
+            <option value="2250">Rp2.250 / butir</option>
+            <option value="2500">Rp2.500 / butir</option>
+          </select>
+          <label for="jumlahTelur">Jumlah telur</label>
+          <input type="text" inputmode="numeric" id="jumlahTelur" placeholder="Contoh: 100" />
           <label for="catatanTelur">Catatan</label>
-          <textarea id="catatanTelur" placeholder="Contoh: Beli telur mentah untuk stok produksi"></textarea>
-          <button class="btn-expense" id="btnSimpanTelur">Simpan Pengeluaran Telur</button>
-          <div class="note" id="statusTelur"></div>
+          <textarea id="catatanTelur" placeholder="Contoh: Beli telur bebek untuk stok produksi"></textarea>
+          <div class="total-preview">Final total telur: <span id="totalTelurPreview">Rp0</span></div>
+          <div class="button-row">
+            <button class="btn-main" id="btnSimpanTelur">Simpan Pengeluaran Telur</button>
+          </div>
+          <div class="note" id="telurStatus"></div>
         </div>
       </section>
 
-      <section class="tab-panel" id="panel-riwayat">
+      <section class="section" id="section-riwayat">
         <div class="card">
-          <h2>Filter Tanggal</h2>
-          <div class="form-grid">
-            <div><label for="filterMulai">Dari tanggal</label><input type="date" id="filterMulai" /></div>
-            <div><label for="filterAkhir">Sampai tanggal</label><input type="date" id="filterAkhir" /></div>
-            <div><label for="modeGrafik">Grafik</label><select id="modeGrafik"><option value="harian">Harian</option><option value="bulanan">Bulanan</option></select></div>
+          <h2>Filter Riwayat</h2>
+          <div class="filter-grid">
+            <div>
+              <label for="filterMulai">Dari tanggal</label>
+              <input type="date" id="filterMulai" />
+            </div>
+            <div>
+              <label for="filterAkhir">Sampai tanggal</label>
+              <input type="date" id="filterAkhir" />
+            </div>
           </div>
+          <div class="button-row">
+            <button class="btn-delete" id="btnHapusSemua">Hapus Semua Data</button>
+          </div>
+          <div class="note" id="hapusStatus"></div>
         </div>
+
         <div class="card">
-          <h2>Grafik Kas</h2>
-          <div class="chart-wrap"><canvas id="grafik" width="1100" height="340"></canvas></div>
+          <h2>Grafik Otomatis</h2>
+          <div class="chart-wrap"><canvas id="grafik" width="1000" height="320"></canvas></div>
         </div>
+
         <div class="card">
           <h2>Riwayat Data</h2>
-          <div class="note" id="hapusStatus"></div>
-          <div class="history-list" id="historyList"></div>
-          <div class="button-row"><button class="btn-delete" id="btnHapusSemua">Hapus Semua Data</button></div>
+          <div class="history-list" id="riwayatData"></div>
         </div>
       </section>
     </div>
@@ -209,8 +203,11 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-  import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+  import { getAuth, onAuthStateChanged, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
   import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+  const ADMIN_PASSWORD = "tampan123";
+  const SESSION_KEY = "kas_telur_asin_admin_ok";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCA0-vpOKAPl220hE9ocTYHcml7wXIDI5A",
@@ -225,338 +222,412 @@
   const auth = getAuth(appFirebase);
   const db = getFirestore(appFirebase);
   const dataRef = collection(db, "penjualan_telur_asin");
-  const ADMIN_PASSWORD = "tampan123";
+
   let semuaDataRealtime = [];
   let unsubscribeData = null;
 
   const el = (id) => document.getElementById(id);
-  const onlyDigits = (value) => String(value || '').replace(/[^0-9]/g, '');
-  const numberFromInput = (id) => Number(onlyDigits(el(id).value)) || 0;
 
-  function formatRupiah(angka) {
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(Number(angka) || 0);
+  function angka(value) {
+    return Number(String(value || "").replace(/[^\d]/g, "")) || 0;
+  }
+
+  function formatRupiah(value) {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0
+    }).format(Number(value) || 0);
   }
 
   function escapeHTML(text) {
-    return String(text || '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
-
-  function setStatus(id, message, type = 'ok') {
-    const target = el(id);
-    if (!target) return;
-    target.innerHTML = message ? '<span class="' + (type === 'error' ? 'status-error' : 'status-ok') + '">' + escapeHTML(message) + '</span>' : '';
+    return String(text || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   }
 
   function initTanggal() {
     const today = new Date().toISOString().slice(0, 10);
-    ['tanggalPemasukan', 'tanggalPengeluaran', 'tanggalTelur'].forEach((id) => { el(id).value = el(id).value || today; });
-    el('filterMulai').value = el('filterMulai').value || today.slice(0, 8) + '01';
-    el('filterAkhir').value = el('filterAkhir').value || today;
+    ["tanggalPemasukan", "tanggalPengeluaran", "tanggalTelur"].forEach((id) => {
+      el(id).value = el(id).value || today;
+    });
+    el("filterMulai").value = el("filterMulai").value || today.slice(0, 8) + "01";
+    el("filterAkhir").value = el("filterAkhir").value || today;
   }
 
-  function showTab(tabName) {
-    document.querySelectorAll('.tab-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === tabName));
-    document.querySelectorAll('.tab-panel').forEach((panel) => panel.classList.toggle('active', panel.id === 'panel-' + tabName));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (tabName === 'riwayat') renderSemua();
+  function bukaApp(user) {
+    el("loginPage").style.display = "none";
+    el("app").style.display = "block";
+    el("userInfo").innerText = "Sinkron realtime aktif";
+    initTanggal();
+    mulaiRealtime();
   }
 
-  function hitungTotalTelur() {
-    const harga = Number(el('hargaTelur').value) || 0;
-    const jumlah = numberFromInput('jumlahTelur');
-    const total = harga * jumlah;
-    el('totalTelurPreview').innerText = formatRupiah(total);
-    return total;
+  function tutupApp() {
+    if (unsubscribeData) unsubscribeData();
+    el("app").style.display = "none";
+    el("loginPage").style.display = "flex";
   }
 
-  function normalizeDoc(d) {
-    const tipe = d.tipe || 'pengeluaran';
-    if (tipe === 'pemasukan') {
-      return { ...d, tipe: 'pemasukan', pemasukan: Number(d.pemasukan || d.penjualan || 0), pengeluaran: 0 };
+  onAuthStateChanged(auth, (user) => {
+    if (user && localStorage.getItem(SESSION_KEY) === "true") {
+      bukaApp(user);
+    } else {
+      tutupApp();
     }
-    if (tipe === 'penjualan') {
-      return { ...d, tipe: 'pemasukan', kategori: 'penjualan lama', nama: d.nama || 'Penjualan lama', pemasukan: Number(d.penjualan || d.pemasukan || 0), pengeluaran: 0 };
+  });
+
+  async function login() {
+    const pass = el("adminPassword").value.trim();
+    el("loginError").innerHTML = "";
+    if (pass !== ADMIN_PASSWORD) {
+      el("loginError").innerHTML = '<span class="status-error">Password salah.</span>';
+      return;
     }
-    return { ...d, tipe: 'pengeluaran', pemasukan: 0, pengeluaran: Number(d.pengeluaran || d.jumlahPengeluaran || d.lain || 0) };
+
+    try {
+      localStorage.setItem(SESSION_KEY, "true");
+      if (!auth.currentUser) {
+        await signInAnonymously(auth);
+      } else {
+        bukaApp(auth.currentUser);
+      }
+    } catch (error) {
+      console.error(error);
+      localStorage.removeItem(SESSION_KEY);
+      el("loginError").innerHTML = '<span class="status-error">Login gagal. Aktifkan Anonymous di Firebase Authentication.</span>';
+    }
+  }
+
+  async function logout() {
+    localStorage.removeItem(SESSION_KEY);
+    await signOut(auth);
+    tutupApp();
+  }
+
+  function mulaiRealtime() {
+    if (unsubscribeData) unsubscribeData();
+
+    unsubscribeData = onSnapshot(dataRef, (snapshot) => {
+      semuaDataRealtime = snapshot.docs
+        .map((item) => ({ id: item.id, ...item.data() }))
+        .filter((d) => ["pemasukan", "pengeluaran", "telur"].includes(d.tipe))
+        .sort((a, b) => String(a.tanggal || "").localeCompare(String(b.tanggal || "")));
+
+      renderSemua();
+    }, (error) => {
+      console.error("Realtime Firestore error:", error);
+      el("hapusStatus").innerHTML = '<span class="status-error">Data gagal dimuat. Cek Firestore Rules.</span>';
+    });
   }
 
   function dataTerfilter() {
-    const mulai = el('filterMulai').value;
-    const akhir = el('filterAkhir').value;
-    return semuaDataRealtime
-      .map(normalizeDoc)
-      .filter((d) => (!mulai || String(d.tanggal || '') >= mulai) && (!akhir || String(d.tanggal || '') <= akhir))
-      .sort((a, b) => String(b.tanggal || '').localeCompare(String(a.tanggal || '')));
+    const mulai = el("filterMulai").value;
+    const akhir = el("filterAkhir").value;
+    return semuaDataRealtime.filter((d) => {
+      const tanggal = String(d.tanggal || "");
+      return (!mulai || tanggal >= mulai) && (!akhir || tanggal <= akhir);
+    });
+  }
+
+  async function simpanPemasukan() {
+    const tanggal = el("tanggalPemasukan").value;
+    const nama = el("namaPemasukan").value.trim();
+    const nominal = angka(el("jumlahPemasukan").value);
+    const catatan = el("catatanPemasukan").value.trim();
+
+    if (!tanggal || !nama || nominal <= 0) {
+      el("pemasukanStatus").innerHTML = '<span class="status-error">Tanggal, nama, dan nominal harus diisi.</span>';
+      return;
+    }
+
+    el("btnSimpanPemasukan").disabled = true;
+    try {
+      await addDoc(dataRef, {
+        tipe: "pemasukan",
+        tanggal,
+        nama,
+        catatan,
+        nominal,
+        pemasukan: nominal,
+        pengeluaran: 0,
+        createdAt: serverTimestamp()
+      });
+      el("namaPemasukan").value = "";
+      el("jumlahPemasukan").value = "";
+      el("catatanPemasukan").value = "";
+      el("pemasukanStatus").innerHTML = '<span class="status-ok">Pemasukan berhasil disimpan.</span>';
+    } catch (error) {
+      console.error(error);
+      el("pemasukanStatus").innerHTML = '<span class="status-error">Gagal simpan pemasukan.</span>';
+    } finally {
+      el("btnSimpanPemasukan").disabled = false;
+      setTimeout(() => el("pemasukanStatus").innerHTML = "", 2500);
+    }
+  }
+
+  async function simpanPengeluaran() {
+    const tanggal = el("tanggalPengeluaran").value;
+    const nama = el("namaPengeluaran").value.trim();
+    const nominal = angka(el("jumlahPengeluaran").value);
+    const catatan = el("catatanPengeluaran").value.trim();
+
+    if (!tanggal || !nama || nominal <= 0) {
+      el("pengeluaranStatus").innerHTML = '<span class="status-error">Tanggal, nama, dan nominal harus diisi.</span>';
+      return;
+    }
+
+    el("btnSimpanPengeluaran").disabled = true;
+    try {
+      await addDoc(dataRef, {
+        tipe: "pengeluaran",
+        tanggal,
+        nama,
+        catatan,
+        nominal,
+        pemasukan: 0,
+        pengeluaran: nominal,
+        createdAt: serverTimestamp()
+      });
+      el("namaPengeluaran").value = "";
+      el("jumlahPengeluaran").value = "";
+      el("catatanPengeluaran").value = "";
+      el("pengeluaranStatus").innerHTML = '<span class="status-ok">Pengeluaran berhasil disimpan.</span>';
+    } catch (error) {
+      console.error(error);
+      el("pengeluaranStatus").innerHTML = '<span class="status-error">Gagal simpan pengeluaran.</span>';
+    } finally {
+      el("btnSimpanPengeluaran").disabled = false;
+      setTimeout(() => el("pengeluaranStatus").innerHTML = "", 2500);
+    }
+  }
+
+  function updateTotalTelur() {
+    const harga = angka(el("hargaTelur").value);
+    const jumlah = angka(el("jumlahTelur").value);
+    el("totalTelurPreview").innerText = formatRupiah(harga * jumlah);
+  }
+
+  async function simpanTelur() {
+    const tanggal = el("tanggalTelur").value;
+    const harga = angka(el("hargaTelur").value);
+    const jumlah = angka(el("jumlahTelur").value);
+    const nominal = harga * jumlah;
+    const catatan = el("catatanTelur").value.trim();
+
+    if (!tanggal || jumlah <= 0 || nominal <= 0) {
+      el("telurStatus").innerHTML = '<span class="status-error">Tanggal dan jumlah telur harus diisi.</span>';
+      return;
+    }
+
+    el("btnSimpanTelur").disabled = true;
+    try {
+      await addDoc(dataRef, {
+        tipe: "telur",
+        tanggal,
+        nama: "Beli telur",
+        catatan: catatan || ("Harga " + formatRupiah(harga) + " x " + jumlah + " butir"),
+        hargaTelur: harga,
+        jumlahTelur: jumlah,
+        nominal,
+        pemasukan: 0,
+        pengeluaran: nominal,
+        createdAt: serverTimestamp()
+      });
+      el("jumlahTelur").value = "";
+      el("catatanTelur").value = "";
+      updateTotalTelur();
+      el("telurStatus").innerHTML = '<span class="status-ok">Pengeluaran telur berhasil disimpan.</span>';
+    } catch (error) {
+      console.error(error);
+      el("telurStatus").innerHTML = '<span class="status-error">Gagal simpan pengeluaran telur.</span>';
+    } finally {
+      el("btnSimpanTelur").disabled = false;
+      setTimeout(() => el("telurStatus").innerHTML = "", 2500);
+    }
+  }
+
+  async function hapusData(id) {
+    try {
+      await deleteDoc(doc(db, "penjualan_telur_asin", id));
+    } catch (error) {
+      console.error(error);
+      el("hapusStatus").innerHTML = '<span class="status-error">Gagal hapus data.</span>';
+      setTimeout(() => el("hapusStatus").innerHTML = "", 2500);
+    }
+  }
+
+  async function hapusSemuaData() {
+    if (!confirm("Yakin hapus semua data pemasukan, pengeluaran, dan telur?")) return;
+    try {
+      const snapshot = await getDocs(dataRef);
+      const proses = snapshot.docs
+        .filter((item) => ["pemasukan", "pengeluaran", "telur"].includes(item.data().tipe))
+        .map((item) => deleteDoc(doc(db, "penjualan_telur_asin", item.id)));
+      await Promise.all(proses);
+      el("hapusStatus").innerHTML = '<span class="status-ok">Semua data berhasil dihapus.</span>';
+    } catch (error) {
+      console.error(error);
+      el("hapusStatus").innerHTML = '<span class="status-error">Gagal hapus semua data.</span>';
+    }
+    setTimeout(() => el("hapusStatus").innerHTML = "", 2500);
   }
 
   function renderSemua() {
     const data = dataTerfilter();
-    renderDashboard(data);
-    renderHistory(data);
-    renderGrafik(kelompokData(data));
+    renderRekap(data);
+    renderRiwayat(data);
+    gambarGrafik(data);
   }
 
-  function renderDashboard(data) {
+  function renderRekap(data) {
     const pemasukan = data.reduce((sum, d) => sum + (Number(d.pemasukan) || 0), 0);
     const pengeluaran = data.reduce((sum, d) => sum + (Number(d.pengeluaran) || 0), 0);
-    const telur = data.reduce((sum, d) => sum + (d.kategori === 'telur' ? (Number(d.pengeluaran) || 0) : 0), 0);
+    const telur = data.filter((d) => d.tipe === "telur").reduce((sum, d) => sum + (Number(d.pengeluaran) || 0), 0);
     const saldo = pemasukan - pengeluaran;
-    el('dashPemasukan').innerText = formatRupiah(pemasukan);
-    el('dashPengeluaran').innerText = formatRupiah(pengeluaran);
-    el('dashSaldo').innerText = formatRupiah(saldo);
-    el('dashTelur').innerText = formatRupiah(telur);
+
+    el("rekapPemasukan").innerText = formatRupiah(pemasukan);
+    el("rekapPengeluaran").innerText = formatRupiah(pengeluaran);
+    el("rekapTelur").innerText = formatRupiah(telur);
+    el("rekapSaldo").innerText = formatRupiah(saldo);
+    el("saldoBox").className = saldo < 0 ? "result-box loss" : "result-box profit";
   }
 
-  function kelompokData(data) {
-    const mode = el('modeGrafik').value;
-    const map = {};
-    data.forEach((d) => {
-      const key = mode === 'bulanan' ? String(d.tanggal || '').slice(0, 7) : String(d.tanggal || '');
-      if (!key) return;
-      if (!map[key]) map[key] = { label: key, pemasukan: 0, pengeluaran: 0 };
-      map[key].pemasukan += Number(d.pemasukan) || 0;
-      map[key].pengeluaran += Number(d.pengeluaran) || 0;
-    });
-    return Object.values(map).sort((a, b) => String(a.label).localeCompare(String(b.label)));
-  }
-
-  function renderHistory(data) {
-    const list = el('historyList');
-    if (!list) return;
-    if (data.length === 0) {
-      list.innerHTML = '<div class="history-item">Belum ada data pada rentang tanggal ini.</div>';
+  function renderRiwayat(data) {
+    const list = el("riwayatData");
+    if (!data.length) {
+      list.innerHTML = '<div class="note">Belum ada data pada filter tanggal ini.</div>';
       return;
     }
 
-    list.innerHTML = data.map((d) => {
-      const isIncome = d.tipe === 'pemasukan';
-      const isEgg = d.kategori === 'telur';
-      const badgeClass = isIncome ? 'badge-income' : (isEgg ? 'badge-egg' : 'badge-expense');
-      const label = isIncome ? 'Pemasukan' : (isEgg ? 'Pengeluaran Telur' : 'Pengeluaran');
-      const value = isIncome ? Number(d.pemasukan) || 0 : Number(d.pengeluaran) || 0;
-      const title = d.nama || d.namaPemasukan || d.namaPengeluaran || (isEgg ? 'Beli telur' : label);
-      const catatan = d.catatan || d.catatanPemasukan || d.catatanPengeluaran || '';
-      const detailTelur = isEgg ? 'Harga ' + formatRupiah(d.hargaTelur || 0) + ' × ' + (Number(d.jumlahTelur) || 0) + ' butir<br>' : '';
+    const sorted = [...data].sort((a, b) => String(b.tanggal || "").localeCompare(String(a.tanggal || "")));
+    list.innerHTML = sorted.map((d) => {
+      const isIn = d.tipe === "pemasukan";
+      const isEgg = d.tipe === "telur";
+      const badgeClass = isIn ? "in" : (isEgg ? "egg" : "out");
+      const label = isIn ? "Pemasukan" : (isEgg ? "Telur" : "Pengeluaran");
+      const amountClass = isIn ? "in" : "out";
+      const amount = isIn ? Number(d.pemasukan || d.nominal || 0) : Number(d.pengeluaran || d.nominal || 0);
+      const sign = isIn ? "+" : "-";
+      const detailTelur = isEgg ? "<br><span class='small'>Jumlah telur: " + escapeHTML(d.jumlahTelur || 0) + " butir, harga: " + formatRupiah(d.hargaTelur || 0) + "</span>" : "";
+
       return `
         <div class="history-item">
           <div class="history-top">
             <div>
               <span class="badge ${badgeClass}">${label}</span>
-              <div class="history-title">${escapeHTML(title)}</div>
-              <div class="history-meta">${escapeHTML(d.tanggal || '-')}<br>${detailTelur}${escapeHTML(catatan)}</div>
+              <div style="margin-top:8px;font-weight:bold">${escapeHTML(d.nama || "-")}</div>
+              <div class="small">${escapeHTML(d.tanggal || "-")}</div>
+              <div class="small">${escapeHTML(d.catatan || "")}${detailTelur}</div>
             </div>
-            <div class="history-value">${isIncome ? '+' : '-'}${formatRupiah(value)}</div>
+            <div style="text-align:right">
+              <div class="amount ${amountClass}">${sign}${formatRupiah(amount)}</div>
+              <button class="btn-delete hapus-item" data-id="${escapeHTML(d.id)}" style="margin-top:10px;padding:9px 12px;font-size:12px">Hapus</button>
+            </div>
           </div>
-          <button type="button" class="btn-delete hapus-item" data-id="${escapeHTML(d.id)}">Hapus</button>
         </div>
       `;
-    }).join('');
+    }).join("");
   }
 
-  function renderGrafik(data) {
-    const canvas = el('grafik');
-    const ctx = canvas.getContext('2d');
+  function gambarGrafik(data) {
+    const canvas = el("grafik");
+    const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.font = '14px Arial';
-    if (data.length === 0) {
-      ctx.fillText('Belum ada data untuk ditampilkan.', 30, 60);
+    ctx.font = "14px Arial";
+
+    if (!data.length) {
+      ctx.fillText("Belum ada data untuk ditampilkan.", 30, 60);
       return;
     }
+
+    const perTanggal = {};
+    data.forEach((d) => {
+      const key = d.tanggal || "-";
+      if (!perTanggal[key]) perTanggal[key] = { label: key, pemasukan: 0, pengeluaran: 0 };
+      perTanggal[key].pemasukan += Number(d.pemasukan) || 0;
+      perTanggal[key].pengeluaran += Number(d.pengeluaran) || 0;
+    });
+
+    const rows = Object.values(perTanggal);
     const pad = 55;
     const w = canvas.width - pad * 2;
     const h = canvas.height - pad * 2;
-    const max = Math.max(...data.flatMap((d) => [d.pemasukan, d.pengeluaran]), 1);
+    const max = Math.max(...rows.flatMap((d) => [d.pemasukan, d.pengeluaran]), 1);
+    const step = w / rows.length;
+    const barW = Math.min(32, step / 4);
 
-    ctx.strokeStyle = '#ddd';
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = "#ddd";
     for (let i = 0; i <= 5; i++) {
       const y = pad + h - (h * i / 5);
-      ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(pad + w, y); ctx.stroke();
-      ctx.fillStyle = '#777'; ctx.fillText(formatRupiah(max * i / 5), 5, y + 4);
+      ctx.beginPath();
+      ctx.moveTo(pad, y);
+      ctx.lineTo(pad + w, y);
+      ctx.stroke();
+      ctx.fillStyle = "#777";
+      ctx.fillText(formatRupiah(max * i / 5).replace(",00", ""), 5, y + 4);
     }
 
-    const step = w / data.length;
-    const barW = Math.min(34, step / 3);
-    data.forEach((d, i) => {
+    rows.forEach((d, i) => {
       const x = pad + i * step + step / 2;
-      drawBar(ctx, x - barW, d.pemasukan, max, pad, h, barW, '#20a049');
-      drawBar(ctx, x + 2, d.pengeluaran, max, pad, h, barW, '#ff5757');
-      ctx.save(); ctx.translate(x - 18, canvas.height - 18); ctx.rotate(-0.35); ctx.fillStyle = '#555'; ctx.fillText(d.label, 0, 0); ctx.restore();
+      drawBar(ctx, x - barW, d.pemasukan, max, pad, h, barW, "#27ae60");
+      drawBar(ctx, x + 4, d.pengeluaran, max, pad, h, barW, "#ff5757");
+      ctx.save();
+      ctx.translate(x - 16, canvas.height - 16);
+      ctx.rotate(-0.35);
+      ctx.fillStyle = "#555";
+      ctx.fillText(d.label, 0, 0);
+      ctx.restore();
     });
 
-    ctx.fillStyle = '#20a049'; ctx.fillRect(pad, 18, 12, 12); ctx.fillStyle = '#333'; ctx.fillText('Pemasukan', pad + 18, 29);
-    ctx.fillStyle = '#ff5757'; ctx.fillRect(pad + 130, 18, 12, 12); ctx.fillStyle = '#333'; ctx.fillText('Pengeluaran', pad + 148, 29);
+    ctx.fillStyle = "#27ae60";
+    ctx.fillRect(pad, 18, 12, 12);
+    ctx.fillStyle = "#333";
+    ctx.fillText("Pemasukan", pad + 18, 29);
+    ctx.fillStyle = "#ff5757";
+    ctx.fillRect(pad + 130, 18, 12, 12);
+    ctx.fillStyle = "#333";
+    ctx.fillText("Pengeluaran", pad + 148, 29);
   }
 
   function drawBar(ctx, x, value, max, pad, h, barW, color) {
-    const tinggi = ((Number(value) || 0) / max) * h;
+    const tinggi = (Number(value) / max) * h;
     ctx.fillStyle = color;
     ctx.fillRect(x, pad + h - tinggi, barW, tinggi);
   }
 
-  async function login() {
-    const pass = el('adminPassword').value.trim();
-    setStatus('loginError', '');
+  document.addEventListener("DOMContentLoaded", () => {
+    el("btnLogin").addEventListener("click", login);
+    el("adminPassword").addEventListener("keydown", (e) => { if (e.key === "Enter") login(); });
+    el("btnLogout").addEventListener("click", logout);
+    el("btnSimpanPemasukan").addEventListener("click", simpanPemasukan);
+    el("btnSimpanPengeluaran").addEventListener("click", simpanPengeluaran);
+    el("btnSimpanTelur").addEventListener("click", simpanTelur);
+    el("btnHapusSemua").addEventListener("click", hapusSemuaData);
+    el("filterMulai").addEventListener("change", renderSemua);
+    el("filterAkhir").addEventListener("change", renderSemua);
+    el("hargaTelur").addEventListener("change", updateTotalTelur);
+    el("jumlahTelur").addEventListener("input", updateTotalTelur);
+    el("riwayatData").addEventListener("click", (e) => {
+      if (e.target.classList.contains("hapus-item")) hapusData(e.target.dataset.id);
+    });
 
-    if (!pass) {
-      setStatus('loginError', 'Password harus diisi.', 'error');
-      return;
-    }
+    document.querySelectorAll(".tab-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+        document.querySelectorAll(".section").forEach((s) => s.classList.remove("active"));
+        btn.classList.add("active");
+        el("section-" + btn.dataset.tab).classList.add("active");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    });
 
-    if (pass !== ADMIN_PASSWORD) {
-      setStatus('loginError', 'Password salah.', 'error');
-      return;
-    }
-
-    try {
-      await signInAnonymously(auth);
-      sessionStorage.setItem('kasTelurAsinLogin', 'true');
-    } catch (error) {
-      console.error('Login anonymous gagal:', error);
-      setStatus('loginError', 'Login gagal. Aktifkan Anonymous di Firebase Authentication.', 'error');
-    }
-  }
-
-  async function logout() { sessionStorage.removeItem('kasTelurAsinLogin'); await signOut(auth); }
-
-  function bukaApp(user) {
-    el('loginPage').style.display = 'none';
-    el('app').style.display = 'block';
-    el('userInfo').innerText = 'Login admin aktif';
     initTanggal();
-    hitungTotalTelur();
-  }
-
-  function mulaiRealtime() {
-    if (unsubscribeData) unsubscribeData();
-    unsubscribeData = onSnapshot(dataRef, (snapshot) => {
-      semuaDataRealtime = snapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
-      renderSemua();
-    }, (error) => {
-      console.error('Realtime Firestore error:', error);
-      setStatus('hapusStatus', 'Data gagal dimuat. Cek Firestore Rules atau koneksi.', 'error');
-    });
-  }
-
-  async function simpanPemasukan() {
-    const tanggal = el('tanggalPemasukan').value;
-    const nama = el('namaPemasukan').value.trim();
-    const jumlah = numberFromInput('jumlahPemasukan');
-    const catatan = el('catatanPemasukan').value.trim();
-    if (!tanggal) { alert('Tanggal pemasukan harus diisi.'); return; }
-    if (!nama) { alert('Nama pemasukan harus diisi.'); return; }
-    if (jumlah <= 0) { alert('Jumlah pemasukan harus lebih dari 0.'); return; }
-    el('btnSimpanPemasukan').disabled = true;
-    setStatus('statusPemasukan', 'Menyimpan pemasukan...');
-    try {
-      await addDoc(dataRef, { tipe: 'pemasukan', kategori: 'umum', tanggal, nama, pemasukan: jumlah, pengeluaran: 0, catatan, createdAt: serverTimestamp(), createdBy: auth.currentUser ? auth.currentUser.uid : 'admin' });
-      el('namaPemasukan').value = ''; el('jumlahPemasukan').value = ''; el('catatanPemasukan').value = '';
-      setStatus('statusPemasukan', 'Pemasukan berhasil disimpan.');
-    } catch (error) { setStatus('statusPemasukan', 'Gagal menyimpan pemasukan.', 'error'); }
-    finally { el('btnSimpanPemasukan').disabled = false; setTimeout(() => setStatus('statusPemasukan', ''), 2500); }
-  }
-
-  async function simpanPengeluaran() {
-    const tanggal = el('tanggalPengeluaran').value;
-    const nama = el('namaPengeluaran').value.trim();
-    const jumlah = numberFromInput('jumlahPengeluaran');
-    const catatan = el('catatanPengeluaran').value.trim();
-    if (!tanggal) { alert('Tanggal pengeluaran harus diisi.'); return; }
-    if (!nama) { alert('Nama pengeluaran harus diisi.'); return; }
-    if (jumlah <= 0) { alert('Jumlah pengeluaran harus lebih dari 0.'); return; }
-    el('btnSimpanPengeluaran').disabled = true;
-    setStatus('statusPengeluaran', 'Menyimpan pengeluaran...');
-    try {
-      await addDoc(dataRef, { tipe: 'pengeluaran', kategori: 'umum', tanggal, nama, pemasukan: 0, pengeluaran: jumlah, catatan, createdAt: serverTimestamp(), createdBy: auth.currentUser ? auth.currentUser.uid : 'admin' });
-      el('namaPengeluaran').value = ''; el('jumlahPengeluaran').value = ''; el('catatanPengeluaran').value = '';
-      setStatus('statusPengeluaran', 'Pengeluaran berhasil disimpan.');
-    } catch (error) { setStatus('statusPengeluaran', 'Gagal menyimpan pengeluaran.', 'error'); }
-    finally { el('btnSimpanPengeluaran').disabled = false; setTimeout(() => setStatus('statusPengeluaran', ''), 2500); }
-  }
-
-  async function simpanTelur() {
-    const tanggal = el('tanggalTelur').value;
-    const hargaTelur = Number(el('hargaTelur').value) || 0;
-    const jumlahTelur = numberFromInput('jumlahTelur');
-    const total = hargaTelur * jumlahTelur;
-    const catatan = el('catatanTelur').value.trim();
-    if (!tanggal) { alert('Tanggal beli telur harus diisi.'); return; }
-    if (jumlahTelur <= 0) { alert('Jumlah telur harus lebih dari 0.'); return; }
-    el('btnSimpanTelur').disabled = true;
-    setStatus('statusTelur', 'Menyimpan pengeluaran telur...');
-    try {
-      await addDoc(dataRef, { tipe: 'pengeluaran', kategori: 'telur', tanggal, nama: 'Beli telur', hargaTelur, jumlahTelur, pemasukan: 0, pengeluaran: total, catatan, createdAt: serverTimestamp(), createdBy: auth.currentUser ? auth.currentUser.uid : 'admin' });
-      el('jumlahTelur').value = ''; el('catatanTelur').value = ''; hitungTotalTelur();
-      setStatus('statusTelur', 'Pengeluaran telur berhasil disimpan.');
-    } catch (error) { setStatus('statusTelur', 'Gagal menyimpan pengeluaran telur.', 'error'); }
-    finally { el('btnSimpanTelur').disabled = false; setTimeout(() => setStatus('statusTelur', ''), 2500); }
-  }
-
-  async function hapusData(id) {
-    if (!id) return;
-    try {
-      await deleteDoc(doc(db, 'penjualan_telur_asin', id));
-      setStatus('hapusStatus', 'Data berhasil dihapus.');
-    } catch (error) { setStatus('hapusStatus', 'Gagal hapus data.', 'error'); }
-    setTimeout(() => setStatus('hapusStatus', ''), 2500);
-  }
-
-  async function hapusSemuaData() {
-    const yakin = confirm('Yakin hapus semua data di Firebase? Data akan hilang di semua device.');
-    if (!yakin) return;
-    try {
-      const snapshot = await getDocs(dataRef);
-      await Promise.all(snapshot.docs.map((item) => deleteDoc(doc(db, 'penjualan_telur_asin', item.id))));
-      setStatus('hapusStatus', 'Semua data berhasil dihapus.');
-    } catch (error) { setStatus('hapusStatus', 'Gagal hapus semua data.', 'error'); }
-    setTimeout(() => setStatus('hapusStatus', ''), 2500);
-  }
-
-  function pasangEvent() {
-    el('btnLogin').addEventListener('click', login);
-    el('adminPassword').addEventListener('keydown', (e) => { if (e.key === 'Enter') login(); });
-    el('btnLogout').addEventListener('click', logout);
-    el('btnSimpanPemasukan').addEventListener('click', simpanPemasukan);
-    el('btnSimpanPengeluaran').addEventListener('click', simpanPengeluaran);
-    el('btnSimpanTelur').addEventListener('click', simpanTelur);
-    el('btnHapusSemua').addEventListener('click', hapusSemuaData);
-    el('hargaTelur').addEventListener('change', hitungTotalTelur);
-    el('jumlahTelur').addEventListener('input', hitungTotalTelur);
-    el('filterMulai').addEventListener('change', renderSemua);
-    el('filterAkhir').addEventListener('change', renderSemua);
-    el('modeGrafik').addEventListener('change', renderSemua);
-    el('historyList').addEventListener('click', (e) => { if (e.target.classList.contains('hapus-item')) hapusData(e.target.dataset.id); });
-    document.querySelectorAll('.tab-btn').forEach((btn) => btn.addEventListener('click', () => showTab(btn.dataset.tab)));
-    ['jumlahPemasukan', 'jumlahPengeluaran', 'jumlahTelur'].forEach((id) => {
-      el(id).addEventListener('input', () => { el(id).value = onlyDigits(el(id).value); });
-    });
-  }
-
-  onAuthStateChanged(auth, async (user) => {
-    const sudahLogin = sessionStorage.getItem('kasTelurAsinLogin') === 'true';
-
-    if (user && sudahLogin) {
-      bukaApp(user);
-      mulaiRealtime();
-      return;
-    }
-
-    if (user && !sudahLogin) {
-      await signOut(auth);
-      return;
-    }
-
-    if (unsubscribeData) unsubscribeData();
-    el('app').style.display = 'none';
-    el('loginPage').style.display = 'flex';
+    updateTotalTelur();
   });
-
-  pasangEvent();
 </script>
 </body>
 </html>
