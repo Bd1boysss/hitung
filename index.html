@@ -46,8 +46,8 @@
     .status-error { color:#d60000; font-weight:bold; }
     .section { display:none; }
     .section.active { display:block; }
-    .chart-wrap { width:100%; overflow-x:auto; }
-    canvas { width:100%; min-height:300px; border:1px solid #f1d7a7; border-radius:16px; background:#fffdf8; }
+    .chart-wrap { width:100%; overflow:hidden; }
+    canvas#grafik { display:block; width:100%; height:390px; border:1px solid #f1d7a7; border-radius:18px; background:#fffdf8; }
     .history-filter { display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; margin: 10px 0 14px; }
     .history-filter-btn { border:1px solid #ffd58a; background:#fff; color:#333; padding:11px 8px; border-radius:14px; font-weight:bold; box-shadow:0 3px 10px rgba(0,0,0,0.06); min-width:0; white-space:normal; }
     .history-filter-btn.active { background:#ff8c00; color:white; border-color:#ff8c00; }
@@ -89,6 +89,7 @@
       .card { padding: 16px; width:100%; max-width:100%; }
       .login-box h1 { font-size: 30px; }
       .result-box strong { font-size: 16px; }
+      canvas#grafik { height: 620px; }
     }
     @media (max-width: 380px) {
       .history-summary { grid-template-columns: 1fr; }
@@ -108,17 +109,6 @@
       .history-top { display: grid !important; grid-template-columns: 1fr !important; }
       .amount { text-align: left !important; }
     }
-
-    /* FIX MOBILE RIWAYAT V3 - paksa tidak melebar di HP */
-    html, body { max-width: 100%; overflow-x: hidden !important; }
-    .container, .card, .section, .history-list, .history-item { max-width: 100% !important; overflow-x: hidden !important; }
-    .history-summary { display: grid !important; grid-template-columns: 1fr !important; width: 100% !important; max-width: 100% !important; gap: 10px !important; }
-    .history-summary-card { width: 100% !important; max-width: 100% !important; min-width: 0 !important; display: block !important; }
-    .history-summary-card strong { font-size: 18px !important; line-height: 1.25 !important; overflow-wrap: anywhere !important; word-break: break-word !important; }
-    .history-filter { display: grid !important; grid-template-columns: 1fr !important; width: 100% !important; gap: 8px !important; }
-    .history-filter-btn { width: 100% !important; white-space: normal !important; }
-    .history-top { display: grid !important; grid-template-columns: 1fr !important; gap: 8px !important; }
-    .history-amount { text-align: left !important; font-size: 22px !important; }
   </style>
 </head>
 <body>
@@ -139,7 +129,7 @@
         <div>
           <h1>Kas Telur Asin Bu Sri</h1>
           <p>Catat pemasukan, pengeluaran, dan khusus pembelian telur.</p>
-          <p class="small">Versi mobile fix riwayat v3</p>
+          <p class="small">Versi mobile fix riwayat v2</p>
           <p class="small" id="userInfo"></p>
         </div>
         <button class="btn-dark" id="btnLogout">Logout</button>
@@ -260,8 +250,9 @@
         </div>
 
         <div class="card">
-          <h2>Grafik Otomatis</h2>
-          <div class="chart-wrap"><canvas id="grafik" width="1000" height="320"></canvas></div>
+          <h2>Grafik Lingkaran HD</h2>
+          <div class="note">Grafik lingkaran besar dan jelas untuk HP. Menampilkan komposisi pemasukan, pengeluaran, dan khusus telur.</div>
+          <div class="chart-wrap"><canvas id="grafik"></canvas></div>
         </div>
 
       </section>
@@ -728,77 +719,164 @@
   }
 
   function gambarGrafik(data) {
+    gambarGrafikLingkaranHD(data);
+  }
+
+  function gambarGrafikLingkaranHD(data) {
     const canvas = el("grafik");
     const ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.font = "14px Arial";
+    const dpr = window.devicePixelRatio || 1;
+    const isMobile = window.innerWidth <= 768;
+    const rectWidth = Math.max((canvas.parentElement ? canvas.parentElement.clientWidth : 320) - 2, 280);
+    const rectHeight = isMobile ? 620 : 390;
 
-    if (!data.length) {
-      ctx.fillText("Belum ada data untuk ditampilkan.", 30, 60);
+    canvas.style.height = rectHeight + "px";
+    canvas.width = Math.round(rectWidth * dpr);
+    canvas.height = Math.round(rectHeight * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    ctx.clearRect(0, 0, rectWidth, rectHeight);
+    ctx.fillStyle = "#fffdf8";
+    ctx.fillRect(0, 0, rectWidth, rectHeight);
+
+    const totalPemasukan = data
+      .filter((d) => tipeEfektif(d) === "pemasukan")
+      .reduce((sum, d) => sum + nominalMasuk(d), 0);
+    const totalPengeluaran = data
+      .filter((d) => tipeEfektif(d) === "pengeluaran")
+      .reduce((sum, d) => sum + nominalKeluar(d), 0);
+    const totalTelur = data
+      .filter((d) => tipeEfektif(d) === "telur")
+      .reduce((sum, d) => sum + nominalKeluar(d), 0);
+
+    const slices = [
+      { label: "Pemasukan", value: totalPemasukan, color: "#27ae60" },
+      { label: "Pengeluaran", value: totalPengeluaran, color: "#ff5757" },
+      { label: "Khusus Telur", value: totalTelur, color: "#ff9f1c" }
+    ].filter((item) => item.value > 0);
+
+    if (!slices.length) {
+      ctx.fillStyle = "#666";
+      ctx.font = "16px Arial";
+      ctx.fillText("Belum ada data untuk ditampilkan.", 22, 60);
       return;
     }
 
-    const perTanggal = {};
-    data.forEach((d) => {
-      const key = d.tanggal || "-";
-      if (!perTanggal[key]) perTanggal[key] = { label: key, pemasukan: 0, pengeluaran: 0, telur: 0 };
-      const tipe = tipeEfektif(d);
-      if (tipe === "pemasukan") perTanggal[key].pemasukan += nominalMasuk(d);
-      if (tipe === "pengeluaran") perTanggal[key].pengeluaran += nominalKeluar(d);
-      if (tipe === "telur") perTanggal[key].telur += nominalKeluar(d);
-    });
+    const total = slices.reduce((sum, item) => sum + item.value, 0);
+    const centerX = isMobile ? rectWidth / 2 : rectWidth * 0.30;
+    const centerY = isMobile ? 165 : rectHeight * 0.54;
+    const radius = isMobile ? Math.min(rectWidth * 0.32, 122) : Math.min(rectWidth, rectHeight) * 0.25;
+    const innerRadius = radius * 0.56;
 
-    const rows = Object.values(perTanggal);
-    const pad = 55;
-    const w = canvas.width - pad * 2;
-    const h = canvas.height - pad * 2;
-    const max = Math.max(...rows.flatMap((d) => [d.pemasukan, d.pengeluaran, d.telur]), 1);
-    const step = w / rows.length;
-    const barW = Math.min(32, step / 4);
+    ctx.shadowColor = "rgba(0,0,0,0.14)";
+    ctx.shadowBlur = 14;
+    ctx.shadowOffsetY = 6;
 
-    ctx.strokeStyle = "#ddd";
-    for (let i = 0; i <= 5; i++) {
-      const y = pad + h - (h * i / 5);
+    let start = -Math.PI / 2;
+    slices.forEach((item) => {
+      const angle = (item.value / total) * Math.PI * 2;
       ctx.beginPath();
-      ctx.moveTo(pad, y);
-      ctx.lineTo(pad + w, y);
-      ctx.stroke();
-      ctx.fillStyle = "#777";
-      ctx.fillText(formatRupiah(max * i / 5).replace(",00", ""), 5, y + 4);
-    }
-
-    rows.forEach((d, i) => {
-      const x = pad + i * step + step / 2;
-      drawBar(ctx, x - barW * 1.4, d.pemasukan, max, pad, h, barW, "#27ae60");
-      drawBar(ctx, x - barW * 0.2, d.pengeluaran, max, pad, h, barW, "#ff5757");
-      drawBar(ctx, x + barW, d.telur, max, pad, h, barW, "#ff9f1c");
-      ctx.save();
-      ctx.translate(x - 16, canvas.height - 16);
-      ctx.rotate(-0.35);
-      ctx.fillStyle = "#555";
-      ctx.fillText(d.label, 0, 0);
-      ctx.restore();
+      ctx.moveTo(centerX, centerY);
+      ctx.arc(centerX, centerY, radius, start, start + angle);
+      ctx.closePath();
+      ctx.fillStyle = item.color;
+      ctx.fill();
+      start += angle;
     });
 
-    ctx.fillStyle = "#27ae60";
-    ctx.fillRect(pad, 18, 12, 12);
-    ctx.fillStyle = "#333";
-    ctx.fillText("Pemasukan", pad + 18, 29);
-    ctx.fillStyle = "#ff5757";
-    ctx.fillRect(pad + 130, 18, 12, 12);
-    ctx.fillStyle = "#333";
-    ctx.fillText("Pengeluaran", pad + 148, 29);
-    ctx.fillStyle = "#ff9f1c";
-    ctx.fillRect(pad + 285, 18, 12, 12);
-    ctx.fillStyle = "#333";
-    ctx.fillText("Khusus Telur", pad + 303, 29);
+    ctx.shadowColor = "transparent";
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
+    ctx.fillStyle = "#fffdf8";
+    ctx.fill();
+
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#777";
+    ctx.font = "13px Arial";
+    ctx.fillText("Total", centerX, centerY - 12);
+    ctx.fillStyle = "#222";
+    ctx.font = isMobile ? "bold 19px Arial" : "bold 17px Arial";
+    ctx.fillText(formatRupiah(total), centerX, centerY + 16);
+
+    start = -Math.PI / 2;
+    slices.forEach((item) => {
+      const angle = (item.value / total) * Math.PI * 2;
+      const mid = start + angle / 2;
+      const x = centerX + Math.cos(mid) * (radius + 20);
+      const y = centerY + Math.sin(mid) * (radius + 10);
+      ctx.fillStyle = "#333";
+      ctx.font = "bold 12px Arial";
+      ctx.textAlign = x < centerX ? "right" : "left";
+      ctx.fillText(((item.value / total) * 100).toFixed(1) + "%", x, y);
+      start += angle;
+    });
+
+    if (isMobile) {
+      ctx.textAlign = "left";
+      ctx.fillStyle = "#333";
+      ctx.font = "bold 18px Arial";
+      ctx.fillText("Ringkasan Grafik", 18, 322);
+
+      let y = 344;
+      slices.forEach((item) => {
+        const persen = ((item.value / total) * 100).toFixed(1) + "%";
+        drawLegendCard(ctx, 18, y, rectWidth - 36, 62, item.color, item.label, formatRupiah(item.value), persen);
+        y += 74;
+      });
+
+      ctx.fillStyle = "#888";
+      ctx.font = "12px Arial";
+      ctx.fillText("Grafik mengikuti filter tanggal.", 18, rectHeight - 18);
+    } else {
+      ctx.textAlign = "left";
+      ctx.fillStyle = "#333";
+      ctx.font = "bold 18px Arial";
+      ctx.fillText("Ringkasan Grafik", rectWidth * 0.58, 54);
+
+      let y = 76;
+      slices.forEach((item) => {
+        const persen = ((item.value / total) * 100).toFixed(1) + "%";
+        drawLegendCard(ctx, rectWidth * 0.58, y, rectWidth * 0.36, 60, item.color, item.label, formatRupiah(item.value), persen);
+        y += 72;
+      });
+    }
   }
 
-  function drawBar(ctx, x, value, max, pad, h, barW, color) {
-    const tinggi = (Number(value) / max) * h;
+  function drawLegendCard(ctx, x, y, w, h, color, label, amount, percent) {
+    ctx.fillStyle = "#ffffff";
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.4;
+    roundRect(ctx, x, y, w, h, 14, true, true);
+
     ctx.fillStyle = color;
-    ctx.fillRect(x, pad + h - tinggi, barW, tinggi);
+    ctx.fillRect(x + 14, y + 18, 16, 16);
+
+    ctx.fillStyle = "#222";
+    ctx.font = "bold 14px Arial";
+    ctx.textAlign = "left";
+    ctx.fillText(label, x + 40, y + 29);
+
+    ctx.fillStyle = "#666";
+    ctx.font = "13px Arial";
+    ctx.fillText(amount, x + 40, y + 49);
+
+    ctx.textAlign = "right";
+    ctx.fillText(percent, x + w - 14, y + 39);
   }
+
+  function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+    const r = Math.min(radius, width / 2, height / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + width, y, x + width, y + height, r);
+    ctx.arcTo(x + width, y + height, x, y + height, r);
+    ctx.arcTo(x, y + height, x, y, r);
+    ctx.arcTo(x, y, x + width, y, r);
+    ctx.closePath();
+    if (fill) ctx.fill();
+    if (stroke) ctx.stroke();
+  }
+
 
   document.addEventListener("DOMContentLoaded", () => {
     el("btnLogin").addEventListener("click", login);
@@ -809,6 +887,7 @@
     el("btnSimpanTelur").addEventListener("click", simpanTelur);
     el("btnHapusSemua").addEventListener("click", hapusSemuaData);
     el("btnDownloadRiwayat").addEventListener("click", downloadRiwayatCSV);
+    window.addEventListener("resize", renderSemua);
     el("filterMulai").addEventListener("change", renderSemua);
     el("filterAkhir").addEventListener("change", renderSemua);
     el("hargaTelur").addEventListener("change", updateTotalTelur);
